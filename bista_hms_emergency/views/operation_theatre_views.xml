@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         OPERATION THEATRE FORM VIEW
+    ============================================================ -->
+
+    <record id="view_operation_theatre_form" model="ir.ui.view">
+        <field name="name">hms.operation.theatre.form</field>
+        <field name="model">hms.operation.theatre</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_pre_op" string="Pre-Op" type="object"
+                        invisible="state != 'scheduled'" class="btn-primary"/>
+                    <button name="action_start" string="Start Surgery" type="object"
+                        invisible="state != 'pre_op'" class="btn-danger"/>
+                    <button name="action_complete" string="Complete" type="object"
+                        invisible="state != 'in_progress'" class="btn-success"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                        invisible="state in ('completed', 'cancelled')"
+                        confirm="Are you sure you want to cancel this OT booking?"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="scheduled,pre_op,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Patient &amp; Source">
+                            <field name="patient_id" options="{'no_create': True}"/>
+                            <field name="operation_type" widget="badge"
+                                decoration-danger="operation_type == 'emergency'"
+                                decoration-warning="operation_type == 'semi_elective'"
+                                decoration-info="operation_type == 'elective'"/>
+                            <field name="emergency_case_id" options="{'no_create': True}"/>
+                            <field name="admission_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Theatre Details">
+                            <field name="ot_room"/>
+                            <field name="scheduled_datetime"/>
+                            <field name="estimated_duration"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Surgical Team">
+                            <field name="surgeon_id" options="{'no_create': True}"/>
+                            <field name="anaesthetist_id" options="{'no_create': True}"/>
+                            <field name="anaesthesia_type"/>
+                            <field name="surgical_team_ids" widget="many2many_tags"
+                                options="{'no_create': True}"/>
+                        </group>
+                        <group string="Actual Times"
+                            invisible="state not in ('in_progress', 'completed')">
+                            <field name="actual_start"/>
+                            <field name="actual_end"
+                                invisible="state != 'completed'"/>
+                            <field name="actual_duration"
+                                invisible="state != 'completed'"/>
+                        </group>
+                    </group>
+
+                    <group string="Cancellation Reason"
+                        invisible="state != 'cancelled'">
+                        <field name="cancelled_reason" nolabel="1"
+                            placeholder="Reason for cancellation..."/>
+                    </group>
+
+                    <notebook>
+                        <page string="Pre-Op Checklist" name="pre_op">
+                            <field name="pre_op_checklist" nolabel="1"/>
+                        </page>
+                        <page string="Operative Notes" name="operative">
+                            <field name="operative_notes" nolabel="1"/>
+                        </page>
+                        <page string="Post-Op Instructions" name="post_op">
+                            <field name="post_op_notes" nolabel="1"/>
+                        </page>
+                        <page string="Diagnoses" name="diagnoses">
+                            <field name="diagnosis_ids">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Complications" name="complications"
+                            invisible="state not in ('in_progress', 'completed')">
+                            <field name="complications" nolabel="1"
+                                placeholder="Document any intra-operative or post-operative complications..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         OPERATION THEATRE LIST VIEW
+    ============================================================ -->
+
+    <record id="view_operation_theatre_list" model="ir.ui.view">
+        <field name="name">hms.operation.theatre.list</field>
+        <field name="model">hms.operation.theatre</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="operation_type == 'emergency'"
+                  decoration-muted="state in ('cancelled',)">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="scheduled_datetime"/>
+                <field name="ot_room"/>
+                <field name="operation_type" widget="badge"
+                    decoration-danger="operation_type == 'emergency'"
+                    decoration-warning="operation_type == 'semi_elective'"
+                    decoration-info="operation_type == 'elective'"/>
+                <field name="surgeon_id"/>
+                <field name="anaesthesia_type" optional="show"/>
+                <field name="estimated_duration" optional="show"/>
+                <field name="actual_duration" optional="show"/>
+                <field name="state" widget="badge"
+                    decoration-info="state == 'scheduled'"
+                    decoration-warning="state == 'pre_op'"
+                    decoration-danger="state == 'in_progress'"
+                    decoration-success="state == 'completed'"
+                    decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         OPERATION THEATRE SEARCH VIEW
+    ============================================================ -->
+
+    <record id="view_operation_theatre_search" model="ir.ui.view">
+        <field name="name">hms.operation.theatre.search</field>
+        <field name="model">hms.operation.theatre</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="surgeon_id"/>
+                <field name="ot_room"/>
+                <filter string="Scheduled" name="scheduled"
+                    domain="[('state','=','scheduled')]"/>
+                <filter string="Pre-Op" name="pre_op"
+                    domain="[('state','=','pre_op')]"/>
+                <filter string="In Progress" name="in_progress"
+                    domain="[('state','=','in_progress')]"/>
+                <filter string="Completed" name="completed"
+                    domain="[('state','=','completed')]"/>
+                <filter string="Cancelled" name="cancelled"
+                    domain="[('state','=','cancelled')]"/>
+                <separator/>
+                <filter string="Emergency" name="emergency"
+                    domain="[('operation_type','=','emergency')]"/>
+                <separator/>
+                <filter string="Today" name="today"
+                    domain="[('scheduled_datetime','&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')), ('scheduled_datetime','&lt;', (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <group>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Operation Type" name="group_type"
+                        context="{'group_by': 'operation_type'}"/>
+                    <filter string="Surgeon" name="group_surgeon"
+                        context="{'group_by': 'surgeon_id'}"/>
+                    <filter string="OT Room" name="group_room"
+                        context="{'group_by': 'ot_room'}"/>
+                    <filter string="Scheduled Date" name="group_date"
+                        context="{'group_by': 'scheduled_datetime:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         ACTIONS
+    ============================================================ -->
+
+    <record id="action_ot_booking" model="ir.actions.act_window">
+        <field name="name">All OT Bookings</field>
+        <field name="res_model">hms.operation.theatre</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_ot_scheduled" model="ir.actions.act_window">
+        <field name="name">Scheduled OT</field>
+        <field name="res_model">hms.operation.theatre</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'scheduled')]</field>
+    </record>
+
+    <record id="action_ot_today" model="ir.actions.act_window">
+        <field name="name">Today's OT</field>
+        <field name="res_model">hms.operation.theatre</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('scheduled_datetime', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')), ('scheduled_datetime', '&lt;', (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%Y-%m-%d 00:00:00'))]</field>
+    </record>
+
+</odoo>

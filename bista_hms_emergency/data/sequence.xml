@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Emergency Case Sequence: ER-2026-0001 -->
+        <record id="seq_emergency_case" model="ir.sequence">
+            <field name="name">Emergency Case</field>
+            <field name="code">hms.emergency.case</field>
+            <field name="prefix">ER-%(year)s-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Admission Sequence: ADM-2026-0001 -->
+        <record id="seq_admission" model="ir.sequence">
+            <field name="name">Patient Admission</field>
+            <field name="code">hms.admission</field>
+            <field name="prefix">ADM-%(year)s-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Nursing Sheet Sequence: NS-2026-0001 -->
+        <record id="seq_nursing_sheet" model="ir.sequence">
+            <field name="name">Nursing Sheet</field>
+            <field name="code">hms.nursing.sheet</field>
+            <field name="prefix">NS-%(year)s-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Discharge Sequence: DIS-2026-0001 -->
+        <record id="seq_discharge" model="ir.sequence">
+            <field name="name">Discharge Record</field>
+            <field name="code">hms.discharge</field>
+            <field name="prefix">DIS-%(year)s-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Reception Sequence: REC-2026-0001 -->
+        <record id="seq_reception" model="ir.sequence">
+            <field name="name">Patient Reception</field>
+            <field name="code">hms.reception</field>
+            <field name="prefix">REC-%(year)s-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- OT Booking Sequence: OT-2026-0001 -->
+        <record id="seq_operation_theatre" model="ir.sequence">
+            <field name="name">OT Booking</field>
+            <field name="code">hms.operation.theatre</field>
+            <field name="prefix">OT-%(year)s-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

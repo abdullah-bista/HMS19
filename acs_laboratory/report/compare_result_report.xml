@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_acs_lab_test_compare_document">
+        <t t-set="doc" t-value="doc.sudo().with_context({'lang':doc.patient_id.partner_id.lang})"/>
+        <t t-call="web.external_layout">
+            <div class="page">
+                <h2 style="text-align: center; margin-top: 20px;">Laboratory Result Comparison</h2>
+                <br/>
+                <table style='width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;'>
+                    <tr t-if="doc.patient_id" style='background-color: #d0eaf3; color: #333;'>
+                        <td style='border: 1px solid #ddd; padding: 8px;'><b>Patient : </b></td>
+                        <td style='border: 1px solid #ddd; padding: 8px;'><div t-out="doc.patient_id.name"/></td>
+                    </tr> 
+                    <tr t-if="doc.patient_id" style='background-color: #d0eaf3; color: #333;'>
+                        <td style='border: 1px solid #ddd; padding: 8px;'><b>Test : </b></td>
+                        <td style='border: 1px solid #ddd; padding: 8px;'><div t-out="doc.test_id.name"/></td>
+                    </tr> 
+                </table>
+                <br/>
+                <t t-if="doc.comparison_results">
+                    <div t-out="doc.comparison_results"/>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_acs_lab_test_compare">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="acs_laboratory.report_acs_lab_test_compare_document" t-lang="doc.sudo().patient_id.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_acs_lab_test_compare" model="ir.actions.report">
+        <field name="name">Lab Comparison Report</field>
+        <field name="model">lab.comparison.result</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">acs_laboratory.report_acs_lab_test_compare</field>
+        <field name="report_file">acs_laboratory.report_acs_lab_test_compare</field>
+        <field name="print_report_name">('LabReport').replace('/','_') + '_LabReport'</field>
+        <field name="binding_model_id" ref="model_lab_comparison_result"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         RECEPTION FORM VIEW
+    ============================================================ -->
+
+    <record id="view_reception_form" model="ir.ui.view">
+        <field name="name">hms.reception.form</field>
+        <field name="model">hms.reception</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_route_to_emergency" string="Route to Emergency"
+                            type="object" invisible="state != 'registered'" class="btn-danger"/>
+                    <button name="action_route_to_appointment" string="Route to Appointment"
+                            type="object"
+                            invisible="state != 'registered' or is_emergency"
+                            class="btn-primary"/>
+                    <button name="action_done" string="Mark Done" type="object"
+                            invisible="state not in ('registered', 'routed')" class="btn-success"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('done', 'cancelled')"
+                            confirm="Are you sure you want to cancel this check-in?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="registered,routed,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_appointment" type="object"
+                                class="oe_stat_button" icon="fa-calendar-check-o"
+                                invisible="not appointment_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Appointment</span>
+                            </div>
+                        </button>
+                        <button name="action_view_emergency_case" type="object"
+                                class="oe_stat_button" icon="fa-ambulance"
+                                invisible="not emergency_case_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Emergency Case</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Patient Information">
+                            <field name="patient_id"/>
+                            <field name="checkin_datetime"/>
+                            <field name="receptionist_id"/>
+                            <field name="is_emergency"/>
+                        </group>
+                        <group string="Routing">
+                            <field name="emergency_case_id" readonly="1"
+                                   invisible="not emergency_case_id"
+                                   options="{'no_create': True}"/>
+                            <field name="appointment_id" readonly="1"
+                                   invisible="not appointment_id"
+                                   options="{'no_create': True}"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <group string="Chief Complaint">
+                        <field name="chief_complaint" nolabel="1" colspan="2"
+                               placeholder="Describe primary symptoms or reason for visit..."/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         RECEPTION LIST VIEW
+    ============================================================ -->
+
+    <record id="view_reception_list" model="ir.ui.view">
+        <field name="name">hms.reception.list</field>
+        <field name="model">hms.reception</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="is_emergency"
+                  decoration-muted="state in ('done', 'cancelled')">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="checkin_datetime"/>
+                <field name="receptionist_id"/>
+                <field name="is_emergency" widget="boolean_toggle"/>
+                <field name="emergency_case_id" optional="show"/>
+                <field name="appointment_id" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'registered'"
+                       decoration-warning="state == 'routed'"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         RECEPTION SEARCH VIEW
+    ============================================================ -->
+
+    <record id="view_reception_search" model="ir.ui.view">
+        <field name="name">hms.reception.search</field>
+        <field name="model">hms.reception</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="receptionist_id"/>
+                <filter string="Registered" name="registered"
+                        domain="[('state','=','registered')]"/>
+                <filter string="Routed" name="routed"
+                        domain="[('state','=','routed')]"/>
+                <filter string="Done" name="done"
+                        domain="[('state','=','done')]"/>
+                <filter string="Cancelled" name="cancelled"
+                        domain="[('state','=','cancelled')]"/>
+                <separator/>
+                <filter string="Emergency" name="emergency"
+                        domain="[('is_emergency','=',True)]"/>
+                <separator/>
+                <filter string="Today" name="today"
+                        domain="[('checkin_datetime','&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <group>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Receptionist" name="group_receptionist"
+                            context="{'group_by': 'receptionist_id'}"/>
+                    <filter string="Date" name="group_date"
+                            context="{'group_by': 'checkin_datetime:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         ACTIONS
+    ============================================================ -->
+
+    <record id="action_reception" model="ir.actions.act_window">
+        <field name="name">All Check-Ins</field>
+        <field name="res_model">hms.reception</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_reception_today" model="ir.actions.act_window">
+        <field name="name">Today's Check-Ins</field>
+        <field name="res_model">hms.reception</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('checkin_datetime', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00'))]
+        </field>
+    </record>
+
+    <record id="action_reception_pending" model="ir.actions.act_window">
+        <field name="name">Pending Check-Ins</field>
+        <field name="res_model">hms.reception</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'registered')]</field>
+    </record>
+
+</odoo>

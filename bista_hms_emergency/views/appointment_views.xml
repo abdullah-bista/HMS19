@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         APPOINTMENT FORM VIEW INHERIT — Consultation Invoice
+    ============================================================ -->
+
+    <record id="view_hms_appointment_form_inherit_invoice" model="ir.ui.view">
+        <field name="name">hms.appointment.form.inherit.invoice</field>
+        <field name="model">hms.appointment</field>
+        <field name="inherit_id" ref="acs_hms.view_hms_appointment_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Invoice smart button in button_box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="view_invoice" type="object"
+                        class="oe_stat_button" icon="fa-file-text-o"
+                        invisible="not invoice_id">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="invoice_count"/>
+                        </span>
+                        <span class="o_stat_text">Invoice</span>
+                    </div>
+                </button>
+                <button name="action_view_lab_requests" type="object"
+                        class="oe_stat_button" icon="fa-flask"
+                        groups="acs_laboratory.group_hms_lab_user">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="lab_request_count"/>
+                        </span>
+                        <span class="o_stat_text">Lab Requests</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <!-- Buttons in header -->
+            <xpath expr="//header" position="inside">
+                <button name="action_create_consultation_invoice"
+                        string="Create Invoice"
+                        type="object"
+                        invisible="state != 'confirm' or invoice_id"
+                        class="btn-primary"/>
+                <button name="action_initiate_lab_request"
+                        string="Initiate Lab Request"
+                        type="object"
+                        invisible="state not in ('in_consultation')"
+                        class="btn-secondary"
+                        groups="acs_laboratory.group_hms_lab_user"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

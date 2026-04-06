@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         NURSING SHEET FORM VIEW
+    ============================================================ -->
+
+    <record id="view_nursing_sheet_form" model="ir.ui.view">
+        <field name="name">hms.nursing.sheet.form</field>
+        <field name="model">hms.nursing.sheet</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start_shift" string="Start Shift" type="object"
+                        invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_complete_shift" string="Complete Shift" type="object"
+                        invisible="state != 'in_progress'" class="btn-primary"/>
+                    <button name="action_review" string="Mark Reviewed" type="object"
+                        invisible="state != 'completed'"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="draft,in_progress,completed,reviewed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <!-- Patient & Shift Info -->
+                    <group>
+                        <group string="Patient &amp; Admission">
+                            <field name="admission_id" options="{'no_create': True}"
+                                invisible="emergency_case_id != False"/>
+                            <field name="emergency_case_id" options="{'no_create': True}"
+                                invisible="admission_id != False"/>
+                            <field name="patient_id" options="{'no_create': True}"
+                                readonly="admission_id != False or emergency_case_id != False"/>
+                        </group>
+                        <group string="Shift Details">
+                            <field name="shift"/>
+                            <field name="shift_date"/>
+                            <field name="nurse_id"/>
+                            <field name="shift_start" invisible="state == 'draft'"/>
+                            <field name="shift_end" invisible="state not in ('completed', 'reviewed')"/>
+                        </group>
+                    </group>
+
+                    <!-- Review Info -->
+                    <group string="Review" invisible="state != 'reviewed'">
+                        <field name="reviewed_by"/>
+                        <field name="review_datetime"/>
+                    </group>
+
+                    <!-- Vital Signs -->
+                    <group string="Vital Signs">
+                        <field name="vitals_ids" nolabel="1"
+                            context="{
+                                'default_recorded_by': uid
+                            }">
+                            <list editable="bottom">
+                                <field name="datetime"/>
+                                <field name="recorded_by"/>
+                                <field name="temperature"/>
+                                <field name="pulse"/>
+                                <field name="systolic_bp"/>
+                                <field name="diastolic_bp"/>
+                                <field name="respiratory_rate"/>
+                                <field name="spo2"/>
+                                <field name="oxygen_therapy" optional="show"/>
+                                <field name="blood_sugar" optional="hide"/>
+                                <field name="gcs_total" optional="show"/>
+                                <field name="notes" optional="hide"/>
+                            </list>
+                        </field>
+                    </group>
+
+                    <!-- Assessment -->
+                    <group string="Clinical Assessment">
+                        <group>
+                            <field name="general_condition" widget="badge"
+                                decoration-success="general_condition == 'stable'"
+                                decoration-info="general_condition == 'improving'"
+                                decoration-warning="general_condition == 'deteriorating'"
+                                decoration-danger="general_condition == 'critical'"/>
+                            <field name="consciousness_level"/>
+                            <field name="pain_level"/>
+                            <field name="mobility_status"/>
+                        </group>
+                        <group>
+                            <field name="patient_complaints"
+                                placeholder="Patient-reported complaints..."/>
+                        </group>
+                    </group>
+
+                    <!-- I/O Charting -->
+                    <group string="Intake / Output Charting">
+                        <group string="Intake (ml)">
+                            <field name="intake_oral"/>
+                            <field name="intake_iv"/>
+                            <field name="intake_other"/>
+                        </group>
+                        <group string="Output">
+                            <field name="output_urine"/>
+                            <field name="output_stool"/>
+                            <field name="output_vomit"/>
+                            <field name="output_drain"/>
+                        </group>
+                        <group string="Balance">
+                            <field name="intake_output_balance"
+                                widget="badge"
+                                decoration-success="intake_output_balance >= 0"
+                                decoration-danger="intake_output_balance &lt; 0"/>
+                        </group>
+                    </group>
+
+                    <!-- Clinical Documentation Tabs -->
+                    <notebook>
+                        <page string="Medications Given" name="medications">
+                            <field name="medications_given" nolabel="1"/>
+                        </page>
+                        <page string="Procedures Done" name="procedures">
+                            <field name="procedures_done" nolabel="1"/>
+                        </page>
+                        <page string="Observations" name="observations">
+                            <field name="observations" nolabel="1"/>
+                        </page>
+                        <page string="Care Plan" name="care_plan">
+                            <field name="care_plan_notes" nolabel="1"/>
+                        </page>
+                        <page string="Handover Notes" name="handover">
+                            <field name="handover_notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         NURSING SHEET LIST VIEW
+    ============================================================ -->
+
+    <record id="view_nursing_sheet_list" model="ir.ui.view">
+        <field name="name">hms.nursing.sheet.list</field>
+        <field name="model">hms.nursing.sheet</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state == 'reviewed'"
+                  decoration-warning="state == 'completed'">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="admission_id"/>
+                <field name="emergency_case_id" optional="show"/>
+                <field name="shift_date"/>
+                <field name="shift"/>
+                <field name="nurse_id"/>
+                <field name="general_condition" widget="badge"
+                    decoration-success="general_condition == 'stable'"
+                    decoration-info="general_condition == 'improving'"
+                    decoration-warning="general_condition == 'deteriorating'"
+                    decoration-danger="general_condition == 'critical'"/>
+                <field name="intake_output_balance"/>
+                <field name="state" widget="badge"
+                    decoration-info="state == 'draft'"
+                    decoration-primary="state == 'in_progress'"
+                    decoration-warning="state == 'completed'"
+                    decoration-success="state == 'reviewed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         NURSING SHEET SEARCH VIEW
+    ============================================================ -->
+
+    <record id="view_nursing_sheet_search" model="ir.ui.view">
+        <field name="name">hms.nursing.sheet.search</field>
+        <field name="model">hms.nursing.sheet</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="admission_id"/>
+                <field name="emergency_case_id"/>
+                <field name="nurse_id"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="In Progress" name="in_progress" domain="[('state','=','in_progress')]"/>
+                <filter string="Pending Review" name="completed" domain="[('state','=','completed')]"/>
+                <filter string="Reviewed" name="reviewed" domain="[('state','=','reviewed')]"/>
+                <separator/>
+                <filter string="Morning Shift" name="morning" domain="[('shift','=','morning')]"/>
+                <filter string="Afternoon Shift" name="afternoon" domain="[('shift','=','afternoon')]"/>
+                <filter string="Night Shift" name="night" domain="[('shift','=','night')]"/>
+                <separator/>
+                <filter string="Today" name="today" domain="[('shift_date','=', context_today())]"/>
+                <filter string="My Sheets" name="mine" domain="[('nurse_id','=', uid)]"/>
+                <group>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Shift" name="group_shift" context="{'group_by': 'shift'}"/>
+                    <filter string="Nurse" name="group_nurse" context="{'group_by': 'nurse_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'shift_date'}"/>
+                    <filter string="Patient" name="group_patient" context="{'group_by': 'patient_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         VITALS STANDALONE LIST (for quick reference)
+    ============================================================ -->
+
+    <record id="view_nursing_vitals_list" model="ir.ui.view">
+        <field name="name">hms.nursing.vitals.list</field>
+        <field name="model">hms.nursing.vitals</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="nursing_sheet_id"/>
+                <field name="datetime"/>
+                <field name="recorded_by"/>
+                <field name="temperature"/>
+                <field name="pulse"/>
+                <field name="systolic_bp"/>
+                <field name="diastolic_bp"/>
+                <field name="respiratory_rate"/>
+                <field name="spo2"/>
+                <field name="gcs_total"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         ACTIONS
+    ============================================================ -->
+
+    <record id="action_nursing_sheet" model="ir.actions.act_window">
+        <field name="name">Nursing Sheets</field>
+        <field name="res_model">hms.nursing.sheet</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_nursing_sheet_my_shift" model="ir.actions.act_window">
+        <field name="name">My Shift Today</field>
+        <field name="res_model">hms.nursing.sheet</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('nurse_id', '=', uid), ('shift_date', '=', context_today())]</field>
+    </record>
+
+    <record id="action_nursing_sheet_pending_review" model="ir.actions.act_window">
+        <field name="name">Pending Review</field>
+        <field name="res_model">hms.nursing.sheet</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'completed')]</field>
+    </record>
+
+    <!-- ============================================================
+         ADMISSION FORM — Nursing Tab + Smart Button (Phase 4 addition)
+    ============================================================ -->
+
+    <record id="view_admission_form_nursing_tab" model="ir.ui.view">
+        <field name="name">hms.admission.form.nursing.tab</field>
+        <field name="model">hms.admission</field>
+        <field name="inherit_id" ref="bista_hms_emergency.view_admission_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Nursing Sheets smart button -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_nursing_sheets" type="object"
+                    class="oe_stat_button" icon="fa-clipboard"
+                    invisible="nursing_sheet_count == 0">
+                    <div class="o_stat_info">
+                        <field name="nursing_sheet_count" class="o_stat_value"/>
+                        <span class="o_stat_text">Nursing</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <!-- Nursing Sheets tab — inserted after Treatments tab -->
+            <xpath expr="//page[@name='treatments']" position="after">
+                <page string="Nursing Sheets" name="nursing_sheets">
+                    <field name="nursing_sheet_ids"
+                        context="{
+                            'default_patient_id': patient_id
+                        }">
+                        <list open_form_view="True">
+                            <field name="name"/>
+                            <field name="shift_date"/>
+                            <field name="shift"/>
+                            <field name="nurse_id"/>
+                            <field name="general_condition" widget="badge"
+                                decoration-success="general_condition == 'stable'"
+                                decoration-warning="general_condition == 'deteriorating'"
+                                decoration-danger="general_condition == 'critical'"/>
+                            <field name="intake_output_balance"/>
+                            <field name="state" widget="badge"
+                                decoration-info="state == 'draft'"
+                                decoration-primary="state == 'in_progress'"
+                                decoration-warning="state == 'completed'"
+                                decoration-success="state == 'reviewed'"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

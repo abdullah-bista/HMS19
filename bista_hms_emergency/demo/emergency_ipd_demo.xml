@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="1">
+
+    <!-- ============================================================
+         WARDS
+    ============================================================ -->
+
+    <record id="demo_ward_emergency" model="hms.ward">
+        <field name="name">Emergency Ward</field>
+        <field name="code">ER</field>
+        <field name="ward_type">emergency</field>
+        <field name="department_id" ref="acs_hms.department_general"/>
+        <field name="notes">24-hour emergency department. Immediate care for critical patients.</field>
+    </record>
+
+    <record id="demo_ward_general" model="hms.ward">
+        <field name="name">General IPD Ward</field>
+        <field name="code">GEN</field>
+        <field name="ward_type">general</field>
+        <field name="department_id" ref="acs_hms.department_general"/>
+        <field name="notes">General in-patient ward for medical admissions.</field>
+    </record>
+
+    <record id="demo_ward_icu" model="hms.ward">
+        <field name="name">ICU</field>
+        <field name="code">ICU</field>
+        <field name="ward_type">icu</field>
+        <field name="department_id" ref="acs_hms.department_cardiology"/>
+        <field name="notes">Intensive Care Unit — monitored beds for critical in-patients.</field>
+    </record>
+
+    <record id="demo_ward_surgical" model="hms.ward">
+        <field name="name">Surgical Ward</field>
+        <field name="code">SURG</field>
+        <field name="ward_type">surgical</field>
+        <field name="department_id" ref="acs_hms.department_general"/>
+        <field name="notes">Post-operative surgical recovery ward.</field>
+    </record>
+
+    <!-- ============================================================
+         ROOMS
+    ============================================================ -->
+
+    <record id="demo_room_er1" model="hms.room">
+        <field name="name">ER Room 1</field>
+        <field name="ward_id" ref="demo_ward_emergency"/>
+        <field name="room_type">private</field>
+        <field name="floor">Ground</field>
+        <field name="facilities">Defibrillator, Ventilator, O2 Supply, Suction Unit</field>
+    </record>
+
+    <record id="demo_room_er2" model="hms.room">
+        <field name="name">ER Room 2</field>
+        <field name="ward_id" ref="demo_ward_emergency"/>
+        <field name="room_type">general</field>
+        <field name="floor">Ground</field>
+        <field name="facilities">Stretcher Bay, O2 Supply, Monitoring</field>
+    </record>
+
+    <record id="demo_room_gen_a" model="hms.room">
+        <field name="name">Room A</field>
+        <field name="ward_id" ref="demo_ward_general"/>
+        <field name="room_type">semi_private</field>
+        <field name="floor">First</field>
+        <field name="facilities">TV, AC, Attached Washroom, Nurse Call</field>
+    </record>
+
+    <record id="demo_room_gen_b" model="hms.room">
+        <field name="name">Room B</field>
+        <field name="ward_id" ref="demo_ward_general"/>
+        <field name="room_type">general</field>
+        <field name="floor">First</field>
+        <field name="facilities">Fan, Nurse Call, Shared Washroom</field>
+    </record>
+
+    <record id="demo_room_icu" model="hms.room">
+        <field name="name">ICU Bay</field>
+        <field name="ward_id" ref="demo_ward_icu"/>
+        <field name="room_type">private</field>
+        <field name="floor">Second</field>
+        <field name="facilities">Cardiac Monitor, Ventilator, Central Line Setup, O2, Suction</field>
+    </record>
+
+    <record id="demo_room_surgical" model="hms.room">
+        <field name="name">Surgical Recovery</field>
+        <field name="ward_id" ref="demo_ward_surgical"/>
+        <field name="room_type">semi_private</field>
+        <field name="floor">Third</field>
+        <field name="facilities">Post-Op Monitor, IV Stand, Nurse Call, AC</field>
+    </record>
+
+    <!-- ============================================================
+         BEDS
+    ============================================================ -->
+
+    <!-- Emergency Beds -->
+    <record id="demo_bed_e01" model="hms.bed">
+        <field name="name">E-01</field>
+        <field name="room_id" ref="demo_room_er1"/>
+        <field name="bed_type">stretcher</field>
+        <field name="state">available</field>
+        <field name="daily_rate">500</field>
+    </record>
+
+    <record id="demo_bed_e02" model="hms.bed">
+        <field name="name">E-02</field>
+        <field name="room_id" ref="demo_room_er2"/>
+        <field name="bed_type">stretcher</field>
+        <field name="state">available</field>
+        <field name="daily_rate">500</field>
+    </record>
+
+    <!-- General Beds -->
+    <record id="demo_bed_g101" model="hms.bed">
+        <field name="name">G-101</field>
+        <field name="room_id" ref="demo_room_gen_a"/>
+        <field name="bed_type">electric</field>
+        <field name="state">occupied</field>
+        <field name="daily_rate">1200</field>
+    </record>
+
+    <record id="demo_bed_g102" model="hms.bed">
+        <field name="name">G-102</field>
+        <field name="room_id" ref="demo_room_gen_a"/>
+        <field name="bed_type">standard</field>
+        <field name="state">available</field>
+        <field name="daily_rate">800</field>
+    </record>
+
+    <record id="demo_bed_g103" model="hms.bed">
+        <field name="name">G-103</field>
+        <field name="room_id" ref="demo_room_gen_b"/>
+        <field name="bed_type">standard</field>
+        <field name="state">available</field>
+        <field name="daily_rate">600</field>
+    </record>
+
+    <record id="demo_bed_g104" model="hms.bed">
+        <field name="name">G-104</field>
+        <field name="room_id" ref="demo_room_gen_b"/>
+        <field name="bed_type">standard</field>
+        <field name="state">reserved</field>
+        <field name="daily_rate">600</field>
+    </record>
+
+    <!-- ICU Beds -->
+    <record id="demo_bed_icu01" model="hms.bed">
+        <field name="name">ICU-01</field>
+        <field name="room_id" ref="demo_room_icu"/>
+        <field name="bed_type">icu</field>
+        <field name="state">occupied</field>
+        <field name="daily_rate">5000</field>
+    </record>
+
+    <record id="demo_bed_icu02" model="hms.bed">
+        <field name="name">ICU-02</field>
+        <field name="room_id" ref="demo_room_icu"/>
+        <field name="bed_type">icu</field>
+        <field name="state">available</field>
+        <field name="daily_rate">5000</field>
+    </record>
+
+    <!-- Surgical Beds -->
+    <record id="demo_bed_s101" model="hms.bed">
+        <field name="name">S-101</field>
+        <field name="room_id" ref="demo_room_surgical"/>
+        <field name="bed_type">electric</field>
+        <field name="state">occupied</field>
+        <field name="daily_rate">1500</field>
+    </record>
+
+    <record id="demo_bed_s102" model="hms.bed">
+        <field name="name">S-102</field>
+        <field name="room_id" ref="demo_room_surgical"/>
+        <field name="bed_type">standard</field>
+        <field name="state">available</field>
+        <field name="daily_rate">1000</field>
+    </record>
+
+    <!-- ============================================================
+         SCENARIO 1 — ER Triage Queue (Arrived)
+         Patient: Neeta k. Shah | Chief: Breathlessness + Chest Tightness
+         Physician: Dr. Laxmi Patil (Cardiology) | State: Arrived
+    ============================================================ -->
+
+    <record id="demo_er_case_1" model="hms.emergency.case">
+        <field name="name">ER-2026-0001</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_0"/>
+        <field name="arrival_datetime">2026-03-19 08:30:00</field>
+        <field name="arrival_mode">ambulance</field>
+        <field name="brought_by">Ramesh Shah (Husband)</field>
+        <field name="brought_by_phone">9898825974</field>
+        <field name="chief_complaint">Sudden onset breathlessness and chest tightness since 30 minutes. History of hypertension.</field>
+        <field name="physician_id" ref="acs_hms.hms_physician_0"/>
+        <field name="department_id" ref="acs_hms.department_cardiology"/>
+        <field name="state">arrived</field>
+        <field name="notes">&lt;p&gt;Patient arrived via ambulance. Appears distressed. SpO2 on room air: 88%. Immediate triage required.&lt;/p&gt;</field>
+    </record>
+
+    <!-- ============================================================
+         SCENARIO 2 — Triage in Progress
+         Patient: Junaid R. Shekh | Chief: Chest Pain radiating to left arm
+         Physician: Dr. Laxmi Patil (Cardiology) | State: Triage
+    ============================================================ -->
+
+    <record id="demo_er_case_2" model="hms.emergency.case">
+        <field name="name">ER-2026-0002</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_5"/>
+        <field name="arrival_datetime">2026-03-19 07:45:00</field>
+        <field name="arrival_mode">walk_in</field>
+        <field name="brought_by">Self</field>
+        <field name="chief_complaint">Severe chest pain radiating to left arm and jaw. Associated sweating and nausea. Onset 1 hour ago.</field>
+        <field name="physician_id" ref="acs_hms.hms_physician_0"/>
+        <field name="department_id" ref="acs_hms.department_cardiology"/>
+        <field name="triage_level">1_immediate</field>
+        <field name="triage_datetime">2026-03-19 07:50:00</field>
+        <field name="triage_notes">Suspected ACS. ECG ordered. Patient diaphoretic. BP 160/100. Pulse 110. SpO2 94%.</field>
+        <field name="state">triage</field>
+        <field name="notes">&lt;p&gt;Suspected Acute Coronary Syndrome. Immediate cardiology consult requested. IV access secured.&lt;/p&gt;</field>
+    </record>
+
+    <!-- ============================================================
+         SCENARIO 3 — Active ER Treatment (LIVE for demo)
+         Patient: Janvi S. Dabhi | Chief: Acute Abdominal Pain
+         Physician: Dr. Himashu Shah (General) | State: Treatment
+    ============================================================ -->
+
+    <record id="demo_er_case_3" model="hms.emergency.case">
+        <field name="name">ER-2026-0003</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_7"/>
+        <field name="arrival_datetime">2026-03-18 22:15:00</field>
+        <field name="arrival_mode">walk_in</field>
+        <field name="brought_by">Suresh Dabhi (Brother)</field>
+        <field name="brought_by_phone">9429231234</field>
+        <field name="chief_complaint">Severe acute abdominal pain, right lower quadrant. Fever 38.8°C. Vomiting x3. Onset 6 hours ago.</field>
+        <field name="physician_id" ref="acs_hms.hms_physician_2"/>
+        <field name="department_id" ref="acs_hms.department_general"/>
+        <field name="triage_level">2_urgent</field>
+        <field name="triage_datetime">2026-03-18 22:20:00</field>
+        <field name="triage_notes">Suspected appendicitis. Guarding present. Rebound tenderness positive. CBC and ultrasound ordered.</field>
+        <field name="state">treatment</field>
+        <field name="notes">&lt;p&gt;USG abdomen confirms acute appendicitis. Surgical consult in progress. Patient kept NPO. IV fluids started.&lt;/p&gt;</field>
+    </record>
+
+    <!-- ============================================================
+         SCENARIO 4 — ER → Admitted to IPD
+         Patient: Rahul K. Makwana | Chief: Road Traffic Accident, Multiple Fractures
+         Physician: Dr. Devishree Shetty (Orthopaedic) | State: Admitted
+    ============================================================ -->
+
+    <record id="demo_er_case_4" model="hms.emergency.case">
+        <field name="name">ER-2026-0004</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_11"/>
+        <field name="arrival_datetime">2026-03-17 14:30:00</field>
+        <field name="arrival_mode">ambulance</field>
+        <field name="brought_by">Police</field>
+        <field name="brought_by_phone">100</field>
+        <field name="chief_complaint">Road traffic accident. Conscious but in pain. Suspected fracture right femur and left radius. Minor head laceration.</field>
+        <field name="physician_id" ref="acs_hms.hms_physician_1"/>
+        <field name="department_id" ref="acs_hms.department_general"/>
+        <field name="triage_level">2_urgent</field>
+        <field name="triage_datetime">2026-03-17 14:35:00</field>
+        <field name="triage_notes">GCS 15/15. X-ray confirms right femur shaft fracture and left distal radius fracture. Head CT clear.</field>
+        <field name="state">admitted</field>
+        <field name="disposition">admitted</field>
+        <field name="disposition_datetime">2026-03-17 17:00:00</field>
+        <field name="notes">&lt;p&gt;Patient stabilised in ER. Right femur traction applied. Shifted to General IPD. Surgery planned for right femur ORIF.&lt;/p&gt;</field>
+    </record>
+
+    <!-- ============================================================
+         SCENARIO 5 — Completed ER Discharge (Historical)
+         Patient: Abdul al Alim | Chief: Deep laceration on right hand
+         Physician: Dr. Wilson (General) | State: Discharged
+    ============================================================ -->
+
+    <record id="demo_er_case_5" model="hms.emergency.case">
+        <field name="name">ER-2026-0005</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_20"/>
+        <field name="arrival_datetime">2026-03-18 11:00:00</field>
+        <field name="arrival_mode">walk_in</field>
+        <field name="brought_by">Self</field>
+        <field name="chief_complaint">Deep laceration on right palm while cooking. Active bleeding. Tetanus status unknown.</field>
+        <field name="physician_id" ref="acs_hms.hms_physician_5"/>
+        <field name="department_id" ref="acs_hms.department_general"/>
+        <field name="triage_level">3_non_urgent</field>
+        <field name="triage_datetime">2026-03-18 11:05:00</field>
+        <field name="triage_notes">Clean laceration 4cm on right palm. No tendon involvement. Wound cleaned and sutured. Tetanus prophylaxis given.</field>
+        <field name="state">discharged</field>
+        <field name="disposition">discharged_home</field>
+        <field name="disposition_datetime">2026-03-18 13:30:00</field>
+        <field name="notes">&lt;p&gt;4cm laceration sutured with 5 nylon sutures. Dressing applied. Patient discharged with antibiotics and wound care instructions. Follow-up in 7 days for suture removal.&lt;/p&gt;</field>
+    </record>
+
+    <!-- ============================================================
+         IPD ADMISSIONS
+    ============================================================ -->
+
+    <!-- Admission 1: Rahul K. Makwana — from ER (RTA), in_progress -->
+    <record id="demo_admission_1" model="hms.admission">
+        <field name="name">ADM-2026-0001</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_11"/>
+        <field name="admission_datetime">2026-03-17 17:00:00</field>
+        <field name="admission_type">emergency</field>
+        <field name="admission_reason">Road traffic accident with right femur shaft fracture and left distal radius fracture. Admitted for orthopaedic surgical management.</field>
+        <field name="emergency_case_id" ref="demo_er_case_4"/>
+        <field name="attending_physician_id" ref="acs_hms.hms_physician_1"/>
+        <field name="ward_id" ref="demo_ward_general"/>
+        <field name="room_id" ref="demo_room_gen_a"/>
+        <field name="bed_id" ref="demo_bed_g101"/>
+        <field name="expected_discharge_date">2026-03-24</field>
+        <field name="state">in_progress</field>
+        <field name="diagnosis_ids" eval="[(4, ref('acs_hms.hms_diseases_6'))]"/>
+    </record>
+
+    <!-- Admission 2: Kamal L. Bhavsar — ICU, Cardiac, in_progress -->
+    <record id="demo_admission_2" model="hms.admission">
+        <field name="name">ADM-2026-0002</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_14"/>
+        <field name="admission_datetime">2026-03-16 09:00:00</field>
+        <field name="admission_type">emergency</field>
+        <field name="admission_reason">Anterior STEMI confirmed on ECG. Primary PCI performed. Admitted to ICU for post-procedure monitoring and cardiac rehabilitation initiation.</field>
+        <field name="attending_physician_id" ref="acs_hms.hms_physician_0"/>
+        <field name="ward_id" ref="demo_ward_icu"/>
+        <field name="room_id" ref="demo_room_icu"/>
+        <field name="bed_id" ref="demo_bed_icu01"/>
+        <field name="expected_discharge_date">2026-03-22</field>
+        <field name="state">in_progress</field>
+        <field name="diagnosis_ids" eval="[(4, ref('acs_hms.hms_diseases_3')), (4, ref('acs_hms.hms_diseases_5'))]"/>
+    </record>
+
+    <!-- Admission 3: John Peter — Elective Hernia, treatment_done (waiting discharge) -->
+    <record id="demo_admission_3" model="hms.admission">
+        <field name="name">ADM-2026-0003</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_2"/>
+        <field name="admission_datetime">2026-03-17 10:00:00</field>
+        <field name="admission_type">elective</field>
+        <field name="admission_reason">Elective laparoscopic inguinal hernia repair. Pre-operative workup completed. Surgery performed successfully on 18-Mar-2026.</field>
+        <field name="attending_physician_id" ref="acs_hms.hms_physician_2"/>
+        <field name="ward_id" ref="demo_ward_surgical"/>
+        <field name="room_id" ref="demo_room_surgical"/>
+        <field name="bed_id" ref="demo_bed_s101"/>
+        <field name="expected_discharge_date">2026-03-19</field>
+        <field name="treatment_done_datetime">2026-03-19 08:00:00</field>
+        <field name="state">treatment_done</field>
+        <field name="diagnosis_ids" eval="[(4, ref('acs_hms.hms_diseases_6'))]"/>
+    </record>
+
+    <!-- ============================================================
+         UPDATE BED OCCUPANCY
+         Link current_admission_id on occupied beds after admissions exist
+    ============================================================ -->
+
+    <record id="demo_bed_g101" model="hms.bed">
+        <field name="current_admission_id" ref="demo_admission_1"/>
+    </record>
+
+    <record id="demo_bed_icu01" model="hms.bed">
+        <field name="current_admission_id" ref="demo_admission_2"/>
+    </record>
+
+    <record id="demo_bed_s101" model="hms.bed">
+        <field name="current_admission_id" ref="demo_admission_3"/>
+    </record>
+
+    <!-- ============================================================
+         OT BOOKING — John Peter (Hernia Repair, Completed)
+    ============================================================ -->
+
+    <record id="demo_ot_1" model="hms.operation.theatre">
+        <field name="name">OT-2026-0001</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_2"/>
+        <field name="admission_id" ref="demo_admission_3"/>
+        <field name="operation_type">elective</field>
+        <field name="ot_room">OT-1 (Laparoscopic)</field>
+        <field name="surgeon_id" ref="acs_hms.hms_physician_2"/>
+        <field name="anaesthetist_id" ref="acs_hms.hms_physician_3"/>
+        <field name="surgical_team_ids" eval="[(4, ref('acs_hms.hms_physician_4')), (4, ref('acs_hms.hms_physician_5'))]"/>
+        <field name="anaesthesia_type">general</field>
+        <field name="scheduled_datetime">2026-03-18 09:00:00</field>
+        <field name="estimated_duration">1.5</field>
+        <field name="actual_start">2026-03-18 09:15:00</field>
+        <field name="actual_end">2026-03-18 10:50:00</field>
+        <field name="state">completed</field>
+        <field name="diagnosis_ids" eval="[(4, ref('acs_hms.hms_diseases_6'))]"/>
+        <field name="pre_op_checklist">&lt;p&gt;&lt;strong&gt;Pre-Op Checklist:&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Consent signed ✓&lt;/li&gt;&lt;li&gt;Blood group and cross-match ✓&lt;/li&gt;&lt;li&gt;NPO since midnight ✓&lt;/li&gt;&lt;li&gt;IV access secured ✓&lt;/li&gt;&lt;li&gt;Antibiotics given ✓&lt;/li&gt;&lt;li&gt;Anaesthesia review done ✓&lt;/li&gt;&lt;/ul&gt;</field>
+        <field name="operative_notes">&lt;p&gt;Laparoscopic inguinal hernia repair performed. Three ports used. Hernia sac identified and reduced. Mesh placed and secured with tacks. Haemostasis confirmed. Ports closed in layers. Procedure uneventful.&lt;/p&gt;</field>
+        <field name="post_op_notes">&lt;p&gt;&lt;strong&gt;Post-Op Instructions:&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;NPO for 4 hours, then liquids&lt;/li&gt;&lt;li&gt;IV paracetamol for pain relief&lt;/li&gt;&lt;li&gt;Monitor urine output&lt;/li&gt;&lt;li&gt;Ambulate by evening&lt;/li&gt;&lt;li&gt;Wound dressing after 24 hours&lt;/li&gt;&lt;/ul&gt;</field>
+    </record>
+
+    <!-- OT Booking 2 — Rahul K. Makwana (Femur ORIF, Scheduled) -->
+    <record id="demo_ot_2" model="hms.operation.theatre">
+        <field name="name">OT-2026-0002</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_11"/>
+        <field name="admission_id" ref="demo_admission_1"/>
+        <field name="operation_type">semi_elective</field>
+        <field name="ot_room">OT-2 (Orthopaedic)</field>
+        <field name="surgeon_id" ref="acs_hms.hms_physician_1"/>
+        <field name="anaesthetist_id" ref="acs_hms.hms_physician_3"/>
+        <field name="surgical_team_ids" eval="[(4, ref('acs_hms.hms_physician_4'))]"/>
+        <field name="anaesthesia_type">spinal</field>
+        <field name="scheduled_datetime">2026-03-20 08:00:00</field>
+        <field name="estimated_duration">3.0</field>
+        <field name="state">scheduled</field>
+        <field name="diagnosis_ids" eval="[(4, ref('acs_hms.hms_diseases_6'))]"/>
+        <field name="pre_op_checklist">&lt;p&gt;&lt;strong&gt;Pre-Op Checklist:&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Consent pending&lt;/li&gt;&lt;li&gt;Blood group sent&lt;/li&gt;&lt;li&gt;Orthopaedic implant ordered&lt;/li&gt;&lt;li&gt;Pre-anaesthesia review scheduled&lt;/li&gt;&lt;/ul&gt;</field>
+    </record>
+
+    <!-- ============================================================
+         NURSING SHEETS
+    ============================================================ -->
+
+    <!-- Nursing Sheet 1: Rahul Makwana — Morning Shift, Completed -->
+    <record id="demo_ns_1" model="hms.nursing.sheet">
+        <field name="name">NS-2026-0001</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_11"/>
+        <field name="admission_id" ref="demo_admission_1"/>
+        <field name="shift">morning</field>
+        <field name="shift_date">2026-03-19</field>
+        <field name="shift_start">2026-03-19 06:00:00</field>
+        <field name="shift_end">2026-03-19 14:00:00</field>
+        <field name="general_condition">stable</field>
+        <field name="consciousness_level">alert</field>
+        <field name="pain_level">5</field>
+        <field name="mobility_status">bedbound</field>
+        <field name="patient_complaints">Pain at fracture site, difficulty sleeping, requesting pain medication.</field>
+        <field name="intake_oral">350</field>
+        <field name="intake_iv">1000</field>
+        <field name="output_urine">900</field>
+        <field name="medications_given">&lt;p&gt;07:00 — Inj. Tramadol 50mg IV given for pain (Dr. order). &lt;br/&gt;09:00 — Tab. Pantoprazole 40mg given with breakfast. &lt;br/&gt;12:00 — IV fluids changed (Normal Saline 500ml running).&lt;/p&gt;</field>
+        <field name="procedures_done">&lt;p&gt;07:30 — Right femur traction weight checked and maintained at 6kg. &lt;br/&gt;10:00 — Wound dressing on scalp laceration changed. No signs of infection.&lt;/p&gt;</field>
+        <field name="observations">&lt;p&gt;Patient alert and cooperative. Vitals stable throughout shift. Pain well-controlled after Tramadol. Traction site clean.&lt;/p&gt;</field>
+        <field name="handover_notes">&lt;p&gt;Handover to afternoon shift: &lt;br/&gt;- Traction maintained at 6kg &lt;br/&gt;- Next Tramadol dose at 19:00 &lt;br/&gt;- Surgery scheduled for 20-Mar-2026, keep NBM from midnight&lt;/p&gt;</field>
+        <field name="state">completed</field>
+    </record>
+
+    <!-- Nursing Sheet 2: Kamal Bhavsar — ICU Night Shift, In Progress -->
+    <record id="demo_ns_2" model="hms.nursing.sheet">
+        <field name="name">NS-2026-0002</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_14"/>
+        <field name="admission_id" ref="demo_admission_2"/>
+        <field name="shift">night</field>
+        <field name="shift_date">2026-03-18</field>
+        <field name="shift_start">2026-03-18 22:00:00</field>
+        <field name="general_condition">improving</field>
+        <field name="consciousness_level">alert</field>
+        <field name="pain_level">3</field>
+        <field name="mobility_status">bedbound</field>
+        <field name="patient_complaints">Mild chest discomfort. Anxiety about condition. Requesting family visit.</field>
+        <field name="intake_iv">500</field>
+        <field name="output_urine">400</field>
+        <field name="medications_given">&lt;p&gt;22:30 — Tab. Aspirin 75mg given as per cardiac protocol. &lt;br/&gt;23:00 — Inj. Heparin 5000 IU subcutaneous given.&lt;/p&gt;</field>
+        <field name="observations">&lt;p&gt;Post-PCI day 2. Continuous cardiac monitoring — sinus rhythm maintained. No arrhythmias noted. Troponin trending down per last reports.&lt;/p&gt;</field>
+        <field name="state">in_progress</field>
+    </record>
+
+    <!-- Nursing Sheet 3: Janvi Dabhi — ER Shift (Emergency Nursing) -->
+    <record id="demo_ns_3" model="hms.nursing.sheet">
+        <field name="name">NS-2026-0003</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_7"/>
+        <field name="emergency_case_id" ref="demo_er_case_3"/>
+        <field name="shift">night</field>
+        <field name="shift_date">2026-03-18</field>
+        <field name="shift_start">2026-03-18 22:30:00</field>
+        <field name="general_condition">deteriorating</field>
+        <field name="consciousness_level">alert</field>
+        <field name="pain_level">8</field>
+        <field name="mobility_status">bedbound</field>
+        <field name="patient_complaints">Severe abdominal pain, not relieved by IV analgesics. Nausea continuing.</field>
+        <field name="intake_iv">500</field>
+        <field name="output_vomit">200</field>
+        <field name="output_urine">300</field>
+        <field name="medications_given">&lt;p&gt;22:45 — Inj. Ondansetron 4mg IV given for nausea. &lt;br/&gt;23:15 — Inj. Buscopan 20mg IV given for pain.&lt;/p&gt;</field>
+        <field name="observations">&lt;p&gt;ER patient with suspected appendicitis. Surgical team reviewing. Patient NPO. IV access x2. Monitor closely for peritoneal signs.&lt;/p&gt;</field>
+        <field name="state">in_progress</field>
+    </record>
+
+    <!-- ============================================================
+         DISCHARGE — Abdul al Alim (ER Discharge, Completed)
+    ============================================================ -->
+
+    <record id="demo_discharge_1" model="hms.discharge">
+        <field name="name">DIS-2026-0001</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_20"/>
+        <field name="discharge_type">emergency</field>
+        <field name="emergency_case_id" ref="demo_er_case_5"/>
+        <field name="discharge_datetime">2026-03-18 13:30:00</field>
+        <field name="physician_id" ref="acs_hms.hms_physician_5"/>
+        <field name="discharge_condition">improved</field>
+        <field name="admission_diagnosis">Deep laceration right palm — accidental knife injury</field>
+        <field name="discharge_diagnosis">Sutured laceration right palm — wound clean, healing expected</field>
+        <field name="treatment_summary">&lt;p&gt;Patient presented with a 4cm deep laceration on the right palm. Wound thoroughly irrigated with normal saline. Local anaesthesia infiltrated. 5 interrupted nylon sutures placed. Sterile dressing applied. Tetanus toxoid 0.5ml IM given.&lt;/p&gt;</field>
+        <field name="discharge_medications">&lt;p&gt;&lt;strong&gt;Discharge Medications:&lt;/strong&gt;&lt;/p&gt;&lt;ol&gt;&lt;li&gt;Tab. Amoxicillin + Clavulanate 625mg — 1 tab twice daily × 5 days&lt;/li&gt;&lt;li&gt;Tab. Ibuprofen 400mg — 1 tab thrice daily after meals × 3 days&lt;/li&gt;&lt;li&gt;Tab. Paracetamol 500mg — SOS for pain&lt;/li&gt;&lt;/ol&gt;</field>
+        <field name="follow_up_instructions">&lt;p&gt;Return to OPD in 7 days for suture removal. If wound shows redness, swelling, or discharge, report immediately.&lt;/p&gt;</field>
+        <field name="follow_up_date">2026-03-25</field>
+        <field name="follow_up_physician_id" ref="acs_hms.hms_physician_5"/>
+        <field name="diet_instructions">No dietary restrictions. Ensure adequate hydration.</field>
+        <field name="activity_restrictions">Avoid getting the wound wet for 48 hours. No strenuous activity involving right hand for 2 weeks.</field>
+        <field name="warning_signs">Return immediately if: fever above 38°C, wound opens, pus discharge, increased swelling or redness.</field>
+        <field name="billing_cleared">True</field>
+        <field name="state">completed</field>
+    </record>
+
+    <!-- Update ER Case 5 with discharge link -->
+    <record id="demo_er_case_5" model="hms.emergency.case">
+        <field name="discharge_id" ref="demo_discharge_1"/>
+    </record>
+
+    <!-- ============================================================
+         RECEPTION / CHECK-IN RECORDS
+    ============================================================ -->
+
+    <!-- Reception 1: Rahul Makwana — Emergency routed, done -->
+    <record id="demo_reception_1" model="hms.reception">
+        <field name="name">REC-2026-0001</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_11"/>
+        <field name="checkin_datetime">2026-03-17 14:25:00</field>
+        <field name="chief_complaint">Brought by police after road traffic accident. Leg and arm injury. Conscious.</field>
+        <field name="is_emergency">True</field>
+        <field name="emergency_case_id" ref="demo_er_case_4"/>
+        <field name="state">done</field>
+    </record>
+
+    <!-- Reception 2: Abdul al Alim — Emergency, done (discharged from ER) -->
+    <record id="demo_reception_2" model="hms.reception">
+        <field name="name">REC-2026-0002</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_20"/>
+        <field name="checkin_datetime">2026-03-18 10:55:00</field>
+        <field name="chief_complaint">Cut on right hand, bleeding actively. Happened while cooking.</field>
+        <field name="is_emergency">False</field>
+        <field name="emergency_case_id" ref="demo_er_case_5"/>
+        <field name="state">done</field>
+    </record>
+
+    <!-- Reception 3: Janvi Dabhi — Emergency, routed to ER (still active) -->
+    <record id="demo_reception_3" model="hms.reception">
+        <field name="name">REC-2026-0003</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_7"/>
+        <field name="checkin_datetime">2026-03-18 22:10:00</field>
+        <field name="chief_complaint">Severe stomach pain, vomiting, fever. Says pain is on the right lower side.</field>
+        <field name="is_emergency">True</field>
+        <field name="emergency_case_id" ref="demo_er_case_3"/>
+        <field name="state">routed</field>
+    </record>
+
+    <!-- Reception 4: Neeta k. Shah — Emergency (ambulance), routed to ER -->
+    <record id="demo_reception_4" model="hms.reception">
+        <field name="name">REC-2026-0004</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_0"/>
+        <field name="checkin_datetime">2026-03-19 08:28:00</field>
+        <field name="chief_complaint">Breathlessness, chest tightness. Arrived via ambulance.</field>
+        <field name="is_emergency">True</field>
+        <field name="emergency_case_id" ref="demo_er_case_1"/>
+        <field name="state">routed</field>
+    </record>
+
+    <!-- Reception 5: Nisha R. Rathi — OPD visit, registered (pending routing) -->
+    <record id="demo_reception_5" model="hms.reception">
+        <field name="name">REC-2026-0005</field>
+        <field name="patient_id" ref="acs_hms.hmshms_patient_12"/>
+        <field name="checkin_datetime">2026-03-19 09:00:00</field>
+        <field name="chief_complaint">Routine follow-up for diabetes management. No acute complaints.</field>
+        <field name="is_emergency">False</field>
+        <field name="state">registered</field>
+    </record>
+
+</data>
+</odoo>

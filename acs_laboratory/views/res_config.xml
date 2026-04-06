@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.laboratory</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="10"/>
+        <field name="inherit_id" ref="acs_hms_base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='laboratory']" position="after">
+                <block title="Laboratory" name="laboratory_setting_container">
+                    <setting help="Location to take consumed Material in Laboratory Test." id="laboratory_stock_location_id_setting">
+                        <field name="laboratory_stock_location_id" class="o_light_label" string="Stock Location"/>
+                    </setting>
+                    <setting help="Location to manage consumed Material in Laboratory Test." id="laboratory_usage_location_id_setting">
+                        <field name="laboratory_usage_location_id" class="o_light_label" string="Stock Usage Location"/>
+                    </setting>
+                    <setting help="Allow user to Authenticate Laboratory Result by scanning QrCode from report." id="acs_labresult_qrcode_setting">
+                        <field name="acs_labresult_qrcode" class="o_light_label" string="Laboratory Result Authentication"/>
+                    </setting>
+                    <setting help="Auto create Samples when user accept Laboratory request." id="acs_auto_create_lab_sample_setting">
+                        <field name="acs_auto_create_lab_sample" class="o_light_label" string="Create Sample Automatically"/>
+                    </setting>
+                    <setting invisible="acs_laboratory_invoice_policy!='in_advance'" help="Do not allow to accept request before completion of payment." id="acs_check_laboratory_payment_setting">
+                        <field name="acs_check_laboratory_payment" class="o_light_label" string="Check Payment Status"/>
+                    </setting>
+                    <setting help="Allow Users to manage Collection Centers." id="group_manage_collection_center_setting">
+                        <field name="group_manage_collection_center" class="o_light_label" string="Manage Collection Centers"/>
+                    </setting>
+                    <setting help="Manage Only Lab Requests" id="acs_no_lab_result">
+                        <field name="acs_no_lab_result" class="o_light_label" string="Manage Only Lab request and result as Attachment in it"/>
+                    </setting>
+                    <setting help="Based on Configured option Create Invoice option will be shown on Laboratory request." id="acs_laboratory_invoice_policy_setting">
+                        <field name="acs_laboratory_invoice_policy" class="o_light_label" string="Invoice Policy"/>
+                    </setting>
+                    <setting help="It will set this disclaimer by default on lab Result &amp; Request Records." id="acs_laboratory_disclaimer_setting">
+                        <field name="acs_laboratory_disclaimer" class="o_light_label" string="Default Disclaimer" placeholder="Add Your Default Disclaimer here.."/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

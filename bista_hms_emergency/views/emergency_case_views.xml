@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         EMERGENCY CASE FORM VIEW
+    ============================================================ -->
+
+    <record id="view_emergency_case_form" model="ir.ui.view">
+        <field name="name">hms.emergency.case.form</field>
+        <field name="model">hms.emergency.case</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_create_invoice" string="Create Invoice" type="object"
+                        invisible="state != 'arrived' or invoice_id != False"
+                        class="btn-warning"/>
+                    <button name="action_triage" string="Start Triage" type="object"
+                        invisible="state != 'arrived'" class="btn-primary"/>
+                    <button name="action_start_treatment" string="Start Treatment" type="object"
+                        invisible="state != 'triage'" class="btn-primary"/>
+                    <button name="action_observe" string="Move to Observation" type="object"
+                        invisible="state != 'treatment'"/>
+                    <button name="action_admit" string="Admit to IPD" type="object"
+                        invisible="state not in ('treatment', 'observation')"
+                        class="btn-success"/>
+                    <button name="action_discharge" string="Discharge" type="object"
+                        invisible="state not in ('treatment', 'observation')"/>
+                    <button name="action_transfer" string="Transfer" type="object"
+                        invisible="state not in ('treatment', 'observation')"/>
+                    <button name="action_deceased" string="Mark Deceased" type="object"
+                        invisible="state not in ('treatment', 'observation')"
+                        confirm="Are you sure you want to mark this patient as deceased in the ER?"/>
+                    <field name="invoice_id" invisible="1"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="arrived,triage,treatment,observation,admitted,discharged"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoice" type="object"
+                            class="oe_stat_button" icon="fa-file-text-o"
+                            invisible="invoice_id == False">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Registration</span>
+                                <span class="o_stat_text">Invoice</span>
+                            </div>
+                        </button>
+                        <button name="action_view_treatments" type="object"
+                            class="oe_stat_button" icon="fa-heartbeat">
+                            <div class="o_stat_info">
+                                <field name="treatment_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Treatments</span>
+                            </div>
+                        </button>
+                        <button name="action_view_lab_requests" type="object"
+                            class="oe_stat_button" icon="fa-flask">
+                            <div class="o_stat_info">
+                                <field name="lab_request_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Lab Requests</span>
+                            </div>
+                        </button>
+                        <button name="action_view_prescriptions" type="object"
+                            class="oe_stat_button" icon="fa-medkit">
+                            <div class="o_stat_info">
+                                <field name="prescription_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Prescriptions</span>
+                            </div>
+                        </button>
+                        <button name="action_view_procedures" type="object"
+                            class="oe_stat_button" icon="fa-stethoscope">
+                            <div class="o_stat_info">
+                                <field name="procedure_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Procedures</span>
+                            </div>
+                        </button>
+                        <button name="action_view_ot_bookings" type="object"
+                            class="oe_stat_button" icon="fa-hospital-o">
+                            <div class="o_stat_info">
+                                <field name="ot_booking_count" class="o_stat_value"/>
+                                <span class="o_stat_text">OT Bookings</span>
+                            </div>
+                        </button>
+                        <button name="action_view_nursing_sheets" type="object"
+                            class="oe_stat_button" icon="fa-clipboard">
+                            <div class="o_stat_info">
+                                <field name="nursing_sheet_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Nursing</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <!-- Patient & Arrival Info -->
+                    <group>
+                        <group string="Patient Information">
+                            <field name="patient_id" options="{'no_create': True}"/>
+                            <field name="arrival_datetime"/>
+                            <field name="arrival_mode"/>
+                            <field name="brought_by" placeholder="Person who brought the patient"/>
+                            <field name="brought_by_phone"/>
+                        </group>
+                        <group string="Medical Team">
+                            <field name="physician_id" options="{'no_create': True}"/>
+                            <field name="department_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <group string="Chief Complaint">
+                        <field name="chief_complaint" nolabel="1" colspan="2"
+                            placeholder="Describe primary symptoms or reason for visit..."/>
+                    </group>
+
+                    <!-- Triage Section -->
+                    <group string="Triage Assessment"
+                        invisible="state == 'arrived'">
+                        <group>
+                            <field name="triage_level"
+                                decoration-danger="triage_level == 'red'"
+                                decoration-warning="triage_level == 'orange'"
+                                decoration-info="triage_level == 'yellow'"
+                                decoration-success="triage_level == 'green'"/>
+                            <field name="triage_datetime"/>
+                            <field name="triage_nurse_id"/>
+                        </group>
+                        <group>
+                            <field name="triage_notes" placeholder="Triage observations..."/>
+                        </group>
+                    </group>
+
+                    <!-- Triage Vitals (G10) -->
+                    <group string="Triage Vitals"
+                        invisible="state == 'arrived'">
+                        <field name="triage_vitals_ids" nolabel="1">
+                            <list editable="bottom">
+                                <field name="datetime"/>
+                                <field name="systolic_bp" string="SBP"/>
+                                <field name="diastolic_bp" string="DBP"/>
+                                <field name="pulse"/>
+                                <field name="respiratory_rate" string="RR"/>
+                                <field name="temperature" string="Temp (°C)"/>
+                                <field name="spo2" string="SpO₂ %"
+                                    decoration-danger="spo2 != 0 and spo2 &lt; 90"/>
+                                <field name="blood_glucose" string="Glucose"/>
+                                <field name="pain_score" string="Pain"/>
+                                <field name="gcs_eye" optional="hide"/>
+                                <field name="gcs_verbal" optional="hide"/>
+                                <field name="gcs_motor" optional="hide"/>
+                                <field name="gcs_total" string="GCS"
+                                    decoration-danger="gcs_total != 0 and gcs_total &lt;= 8"/>
+                                <field name="recorded_by"/>
+                                <field name="notes" optional="hide"/>
+                            </list>
+                        </field>
+                    </group>
+
+                    <!-- Special Condition Flags (G11) -->
+                    <group string="⚑ Special Conditions"
+                        invisible="state == 'arrived'">
+                        <group>
+                            <field name="flag_pregnancy"/>
+                            <field name="flag_pediatric"/>
+                            <field name="flag_geriatric"/>
+                            <field name="flag_known_allergy"/>
+                        </group>
+                        <group>
+                            <field name="flag_mlc" widget="boolean_toggle"
+                                decoration-danger="flag_mlc == True"/>
+                            <field name="flag_infectious"/>
+                            <field name="flag_vip"/>
+                            <field name="flag_mental"/>
+                        </group>
+                    </group>
+
+                    <!-- Disposition Section (terminal states only) -->
+                    <group string="Disposition"
+                        invisible="state not in ('admitted', 'discharged', 'transferred', 'deceased')">
+                        <field name="disposition"/>
+                        <field name="disposition_datetime"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Treatments" name="treatments">
+                            <field name="treatment_ids"
+                                context="{
+                                    'default_patient_id': patient_id,
+                                    'default_physician_id': physician_id,
+                                    'default_is_emergency': True
+                                }">
+                                <list open_form_view="True">
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="physician_id"/>
+                                    <field name="diagnosis_id"/>
+                                    <field name="state" widget="badge"
+                                        decoration-info="state == 'draft'"
+                                        decoration-success="state == 'done'"
+                                        decoration-muted="state == 'cancel'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Lab Requests" name="lab_requests">
+                            <field name="lab_request_ids"
+                                context="{
+                                    'default_patient_id': patient_id,
+                                    'default_physician_id': physician_id,
+                                    'default_is_emergency': True
+                                }">
+                                <list open_form_view="True">
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="physician_id"/>
+                                    <field name="state" widget="badge"
+                                        decoration-info="state == 'draft'"
+                                        decoration-success="state == 'done'"
+                                        decoration-muted="state == 'cancel'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Prescriptions" name="prescriptions">
+                            <field name="prescription_ids"
+                                context="{
+                                    'default_patient_id': patient_id,
+                                    'default_physician_id': physician_id,
+                                    'default_is_emergency': True
+                                }">
+                                <list open_form_view="True">
+                                    <field name="name"/>
+                                    <field name="prescription_date"/>
+                                    <field name="physician_id"/>
+                                    <field name="state" widget="badge"
+                                        decoration-info="state == 'draft'"
+                                        decoration-success="state == 'prescription'"
+                                        decoration-muted="state == 'canceled'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Procedures (OT)" name="procedures">
+                            <field name="procedure_ids"
+                                context="{
+                                    'default_patient_id': patient_id,
+                                    'default_physician_id': physician_id,
+                                    'default_is_emergency': True
+                                }">
+                                <list open_form_view="True">
+                                    <field name="name"/>
+                                    <field name="product_id"/>
+                                    <field name="date"/>
+                                    <field name="physician_id"/>
+                                    <field name="state" widget="badge"
+                                        decoration-info="state == 'scheduled'"
+                                        decoration-success="state == 'done'"
+                                        decoration-muted="state == 'cancel'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Nursing Sheets" name="nursing_sheets">
+                            <field name="nursing_sheet_ids"
+                                context="{
+                                    'default_patient_id': patient_id,
+                                    'default_emergency_case_id': id
+                                }">
+                                <list open_form_view="True">
+                                    <field name="name"/>
+                                    <field name="shift_date"/>
+                                    <field name="shift"/>
+                                    <field name="nurse_id"/>
+                                    <field name="general_condition" widget="badge"
+                                        decoration-success="general_condition == 'stable'"
+                                        decoration-warning="general_condition == 'deteriorating'"
+                                        decoration-danger="general_condition == 'critical'"/>
+                                    <field name="intake_output_balance"/>
+                                    <field name="state" widget="badge"
+                                        decoration-info="state == 'draft'"
+                                        decoration-primary="state == 'in_progress'"
+                                        decoration-warning="state == 'completed'"
+                                        decoration-success="state == 'reviewed'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Clinical Notes" name="notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         EMERGENCY CASE LIST VIEW
+    ============================================================ -->
+
+    <record id="view_emergency_case_list" model="ir.ui.view">
+        <field name="name">hms.emergency.case.list</field>
+        <field name="model">hms.emergency.case</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="triage_level == 'red'"
+                  decoration-warning="triage_level == 'orange'"
+                  decoration-muted="state in ('discharged', 'transferred', 'deceased')">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="arrival_datetime"/>
+                <field name="arrival_mode"/>
+                <field name="triage_level" widget="badge"
+                    decoration-danger="triage_level == 'red'"
+                    decoration-warning="triage_level == 'orange'"
+                    decoration-info="triage_level == 'yellow'"
+                    decoration-success="triage_level == 'green'"/>
+                <field name="flag_mlc" string="MLC"
+                    decoration-danger="flag_mlc == True"/>
+                <field name="physician_id"/>
+                <field name="department_id"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         EMERGENCY CASE KANBAN VIEW
+    ============================================================ -->
+
+    <record id="view_emergency_case_kanban" model="ir.ui.view">
+        <field name="name">hms.emergency.case.kanban</field>
+        <field name="model">hms.emergency.case</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="state"/>
+                <field name="patient_id"/>
+                <field name="triage_level"/>
+                <field name="arrival_datetime"/>
+                <field name="physician_id"/>
+                <field name="chief_complaint"/>
+                <field name="flag_mlc"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click
+                            #{record.triage_level.raw_value == 'red'    ? 'border-danger' :
+                              record.triage_level.raw_value == 'orange' ? 'border-warning' :
+                              record.triage_level.raw_value == 'yellow' ? 'border-info' : ''}">
+                            <div class="oe_kanban_content p-2">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <strong><field name="name"/></strong>
+                                    <div class="d-flex gap-1">
+                                        <span t-if="record.flag_mlc.raw_value"
+                                            class="badge rounded-pill bg-danger">MLC</span>
+                                        <span t-if="record.triage_level.raw_value"
+                                            t-attf-class="badge rounded-pill
+                                                #{record.triage_level.raw_value == 'red'    ? 'bg-danger' :
+                                                  record.triage_level.raw_value == 'orange' ? 'bg-warning' :
+                                                  record.triage_level.raw_value == 'yellow' ? 'bg-info' : 'bg-success'}">
+                                            <field name="triage_level"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold">
+                                    <i class="fa fa-user"/> <field name="patient_id"/>
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    <i class="fa fa-clock-o"/> <field name="arrival_datetime"/>
+                                </div>
+                                <div t-if="record.physician_id.raw_value" class="small mt-1">
+                                    <i class="fa fa-user-md"/> <field name="physician_id"/>
+                                </div>
+                                <div class="mt-1 small text-truncate" t-if="record.chief_complaint.raw_value">
+                                    <field name="chief_complaint"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         EMERGENCY CASE SEARCH VIEW
+    ============================================================ -->
+
+    <record id="view_emergency_case_search" model="ir.ui.view">
+        <field name="name">hms.emergency.case.search</field>
+        <field name="model">hms.emergency.case</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="physician_id"/>
+                <field name="department_id"/>
+                <!-- State Filters -->
+                <filter string="Arrived" name="arrived" domain="[('state','=','arrived')]"/>
+                <filter string="Triage" name="triage" domain="[('state','=','triage')]"/>
+                <filter string="Active Treatment" name="treatment"
+                    domain="[('state','in',('treatment','observation'))]"/>
+                <filter string="Admitted" name="admitted" domain="[('state','=','admitted')]"/>
+                <filter string="Discharged" name="discharged" domain="[('state','=','discharged')]"/>
+                <separator/>
+                <!-- Triage Level Filters -->
+                <filter string="Level 1 - Immediate" name="level1"
+                    domain="[('triage_level','=','1_immediate')]"/>
+                <filter string="Level 2 - Urgent" name="level2"
+                    domain="[('triage_level','=','2_urgent')]"/>
+                <separator/>
+                <filter string="Today" name="today"
+                    domain="[('arrival_datetime','>=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <!-- Group By -->
+                <group>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Triage Level" name="group_triage" context="{'group_by': 'triage_level'}"/>
+                    <filter string="Physician" name="group_physician" context="{'group_by': 'physician_id'}"/>
+                    <filter string="Department" name="group_dept" context="{'group_by': 'department_id'}"/>
+                    <filter string="Arrival Date" name="group_date" context="{'group_by': 'arrival_datetime:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         ACTIONS
+    ============================================================ -->
+
+    <record id="action_emergency_case" model="ir.actions.act_window">
+        <field name="name">Emergency Cases</field>
+        <field name="res_model">hms.emergency.case</field>
+        <field name="view_mode">list,kanban,form</field>
+    </record>
+
+    <record id="action_emergency_triage_queue" model="ir.actions.act_window">
+        <field name="name">Triage Queue</field>
+        <field name="res_model">hms.emergency.case</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('state', 'in', ['arrived', 'triage'])]</field>
+        <field name="context">{'search_default_arrived': 1}</field>
+    </record>
+
+    <record id="action_emergency_active_treatment" model="ir.actions.act_window">
+        <field name="name">Active Treatment</field>
+        <field name="res_model">hms.emergency.case</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('state', 'in', ['treatment', 'observation'])]</field>
+    </record>
+
+    <record id="action_emergency_discharges" model="ir.actions.act_window">
+        <field name="name">ER Discharges</field>
+        <field name="res_model">hms.emergency.case</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'discharged')]</field>
+    </record>
+
+</odoo>

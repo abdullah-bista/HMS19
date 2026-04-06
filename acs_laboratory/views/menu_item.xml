@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Laboratory Root Menu -->
+    <menuitem id="menu_laboratory" name="Laboratory" sequence="35" web_icon="acs_laboratory,static/description/icon.png" groups="acs_laboratory.group_hms_lab_user,acs_laboratory.group_hms_lab_sample_user"/> 
+    <menuitem id='menu_lab_request' parent='menu_laboratory' action='hms_action_lab_test_request' sequence="10" groups="acs_laboratory.group_hms_lab_sample_user,base.group_system"/>
+    <menuitem id='menu_lab_test_result' parent='menu_laboratory' action='action_lab_result' sequence="20"/>
+    <!-- <menuitem id='menu_lab_sample' action='action_acs_patient_laboratory_sample' parent='menu_laboratory' sequence="30"/> -->
+    <menuitem id="menu_laboratory_report" name="Report" sequence="35" parent='menu_laboratory'/> 
+    <menuitem id='menu_lab_test_compare' action='action_lab_result_compare' parent='menu_laboratory_report' sequence="10"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_hms_lab_cofig" name="Configuration" parent="menu_laboratory" groups="acs_hms_base.group_hms_manager,acs_laboratory.group_hms_lab_manager" sequence="100"/>
+
+    <menuitem id='menu_lab_test' parent='menu_hms_lab_cofig' action='hms_action_form_test' sequence="10"/>
+    <menuitem id='menu_lab_test_uom' parent='menu_hms_lab_cofig' action='action_acs_test_uom' sequence="20"/>
+    <menuitem id='menu_acs_laboratory' parent='menu_hms_lab_cofig' action='action_acs_laboratory' sequence="30"/>
+    <menuitem id='menu_acs_collection_center' parent='menu_hms_lab_cofig' action='action_acs_collection_center' sequence="35" groups="acs_laboratory.group_manage_collection_center"/>
+    <menuitem id='menu_acs_laboratory_group' parent='menu_hms_lab_cofig' action='action_laboratory_group' sequence="40"/>
+    <menuitem id='menu_acs_laboratory_sample_type' parent='menu_hms_lab_cofig' action='action_acs_laboratory_sample_type' sequence="50"/>
+    <menuitem id='menu_acs_laboratory_test_category' parent='menu_hms_lab_cofig' action='action_acs_laboratory_test_category' sequence="60"/>
+
+    <!-- Labsample Root Menu -->
+    <menuitem id="menu_lab_sample_root" name="Lab Sample" groups="acs_laboratory.group_hms_lab_sample_user" web_icon="acs_laboratory,static/description/lab_sample.png"/>
+    <menuitem id='menu_lab_sample' action='action_acs_patient_laboratory_sample' parent='menu_lab_sample_root' sequence="30"/>
+
+</odoo>

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_discharge_summary_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- Header -->
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <h2>DISCHARGE SUMMARY</h2>
+                                <h4 t-field="o.name"/>
+                            </div>
+                        </div>
+
+                        <!-- Patient & Discharge Info -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <table class="table table-sm table-bordered">
+                                    <tr>
+                                        <th style="width:40%">Patient</th>
+                                        <td><t t-field="o.patient_id"/></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date of Birth</th>
+                                        <td><t t-field="o.patient_id.birthday"/></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Gender</th>
+                                        <td><t t-field="o.patient_id.gender"/></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Discharge Type</th>
+                                        <td><t t-field="o.discharge_type"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-bordered">
+                                    <tr>
+                                        <th style="width:40%">Discharge Date</th>
+                                        <td><t t-field="o.discharge_datetime" t-options='{"format": "dd/MM/yyyy HH:mm"}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Discharging Physician</th>
+                                        <td><t t-field="o.physician_id"/></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Discharge Condition</th>
+                                        <td><t t-field="o.discharge_condition"/></td>
+                                    </tr>
+                                    <t t-if="o.discharge_type == 'ipd' and o.admission_id">
+                                        <tr>
+                                            <th>Admission No.</th>
+                                            <td><t t-field="o.admission_id.name"/></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Admission Date</th>
+                                            <td><t t-field="o.admission_id.admission_datetime" t-options='{"format": "dd/MM/yyyy HH:mm"}'/></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Length of Stay</th>
+                                            <td><t t-field="o.admission_id.length_of_stay"/> days</td>
+                                        </tr>
+                                    </t>
+                                    <t t-if="o.discharge_type == 'emergency' and o.emergency_case_id">
+                                        <tr>
+                                            <th>ER Case No.</th>
+                                            <td><t t-field="o.emergency_case_id.name"/></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Arrival Date</th>
+                                            <td><t t-field="o.emergency_case_id.arrival_datetime" t-options='{"format": "dd/MM/yyyy HH:mm"}'/></td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Diagnoses -->
+                        <div class="row mb-3" t-if="o.admission_diagnosis or o.discharge_diagnosis or o.diagnosis_ids">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-1">Diagnoses</h5>
+                            </div>
+                            <div class="col-6" t-if="o.admission_diagnosis">
+                                <strong>Diagnosis at Admission:</strong>
+                                <p><t t-field="o.admission_diagnosis"/></p>
+                            </div>
+                            <div class="col-6" t-if="o.discharge_diagnosis">
+                                <strong>Final Discharge Diagnosis:</strong>
+                                <p><t t-field="o.discharge_diagnosis"/></p>
+                            </div>
+                            <div class="col-12" t-if="o.diagnosis_ids">
+                                <strong>Final Diagnoses:</strong>
+                                <p><t t-foreach="o.diagnosis_ids" t-as="d"><t t-field="d.name"/><t t-if="not d_last">, </t></t></p>
+                            </div>
+                        </div>
+
+                        <!-- Clinical Summary -->
+                        <div class="row mb-3" t-if="o.treatment_summary">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-1">Treatment Summary</h5>
+                                <div t-field="o.treatment_summary"/>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3" t-if="o.procedures_summary">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-1">Procedures</h5>
+                                <div t-field="o.procedures_summary"/>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3" t-if="o.investigation_summary">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-1">Investigations</h5>
+                                <div t-field="o.investigation_summary"/>
+                            </div>
+                        </div>
+
+                        <!-- Discharge Medications -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-1">Discharge Medications</h5>
+                                <div t-field="o.discharge_medications"/>
+                            </div>
+                        </div>
+
+                        <!-- Follow-up -->
+                        <div class="row mb-3" t-if="o.follow_up_date or o.follow_up_instructions">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-1">Follow-up</h5>
+                            </div>
+                            <div class="col-6" t-if="o.follow_up_date">
+                                <strong>Follow-up Date:</strong>
+                                <p><t t-field="o.follow_up_date" t-options='{"format": "dd/MM/yyyy"}'/></p>
+                            </div>
+                            <div class="col-6" t-if="o.follow_up_physician_id">
+                                <strong>Follow-up Physician:</strong>
+                                <p><t t-field="o.follow_up_physician_id"/></p>
+                            </div>
+                            <div class="col-12" t-if="o.follow_up_instructions">
+                                <div t-field="o.follow_up_instructions"/>
+                            </div>
+                        </div>
+
+                        <!-- Patient Instructions -->
+                        <div class="row mb-3" t-if="o.diet_instructions or o.activity_restrictions or o.warning_signs">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-1">Patient Instructions</h5>
+                            </div>
+                            <div class="col-4" t-if="o.diet_instructions">
+                                <strong>Diet:</strong>
+                                <p><t t-field="o.diet_instructions"/></p>
+                            </div>
+                            <div class="col-4" t-if="o.activity_restrictions">
+                                <strong>Activity:</strong>
+                                <p><t t-field="o.activity_restrictions"/></p>
+                            </div>
+                            <div class="col-4" t-if="o.warning_signs">
+                                <strong>Warning Signs:</strong>
+                                <p><t t-field="o.warning_signs"/></p>
+                            </div>
+                        </div>
+
+                        <!-- Signature -->
+                        <div class="row mt-5">
+                            <div class="col-6 text-center">
+                                <div class="border-top pt-2">
+                                    <strong>Discharging Physician</strong><br/>
+                                    <t t-field="o.physician_id"/>
+                                </div>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div class="border-top pt-2">
+                                    <strong>Approved By</strong><br/>
+                                    <t t-field="o.approved_by"/>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

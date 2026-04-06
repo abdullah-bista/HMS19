@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="report_prescription_table">
+        <table class="table table-sm o_main_table mt16">
+            <thead>
+                <tr>
+                    <th name="th_no"></th>
+                    <th name="th_description" class="text-start">Rx</th>
+                    <th name="th_dose" class="text-start">Dose Qty.</th>
+                    <th name="th_total" class="text-end">Total Qty.</th>
+                </tr>
+            </thead>
+            <tbody>
+                <t t-foreach="prescription.prescription_line_ids" t-as="line">
+                    <tr>
+                        <t t-if="not line.display_type">
+                            <td name="td_no">
+                                <span t-esc="line_index + 1"/>
+                            </td>
+                            <td name="td_description">
+                                <div name="name">
+                                    <t t-if="line.name">
+                                        <span t-field="line.name"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span t-field="line.sudo().product_id.name"/>
+                                    </t>
+                                </div>
+                                <div name="common_dosage" t-if="line.common_dosage_id">
+                                    <t t-if="line.common_dosage_id.abbreviation">
+                                        <span t-field="line.common_dosage_id.abbreviation"/> - 
+                                    </t>
+                                    <span t-field="line.common_dosage_id.name"/>
+                                </div>
+                                <div name="short_comment" t-if="line.short_comment">
+                                    Notes: <span t-field="line.short_comment"/>
+                                </div>
+                                <t t-if="line.allow_substitution">Allow Substitution</t>
+                            </td>
+                            <td name="td_dose">
+                                <div name="dose">
+                                    <span t-field="line.dose"/> <span style="margin-left:5px;" t-field="line.dosage_uom_id"/>
+                                </div>
+                                <div t-if="not line.manual_prescription_qty" name="days">(<span t-field="line.days"/> Days)</div>
+                            </td>
+                            <td name="td_total" class="text-end">
+                                <span t-field="line.quantity"/> <span style="margin-left:5px;" t-field="line.dosage_uom_id"/>
+                            </td>
+                        </t>
+                        <t t-if="line.display_type == 'line_section'">
+                            <td colspan="99">
+                                <span t-field="line.name"/>
+                            </td>
+                        </t>
+                        <t t-if="line.display_type == 'line_note'">
+                            <td colspan="99">
+                                <span t-field="line.name"/>
+                            </td>
+                        </t>
+                    </tr>
+                </t>
+            </tbody>
+        </table>
+    </template>
+
+    <template id="report_hms_prescription_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context({'lang':doc.patient_id.lang})"/>
+            <div class="page">
+
+                <div class="mt8 mb8 text-center">
+                    <h2>
+                        <strong>Medical Prescription:</strong> <span t-field="doc.name"/>
+                    </h2>
+                </div>
+
+                <table class="table table-condensed">
+                    <tbody>
+                        <tr>
+                            <td style="width:20%;">
+                                <strong>Patient:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.patient_id"/>
+                            </td>
+                            <td style="width:20%;">
+                                <strong>Date:</strong>
+                            </td>
+                            <td style="width: 30%;">
+                                <span t-field="doc.prescription_date"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Age/Gender:</strong>
+                            </td>
+                            <td>
+                                <span t-field="doc.patient_id.age"/>/<span t-field="doc.patient_id.gender"/>
+                            </td>
+                            <td>
+                                <strong>Doctor:</strong>
+                            </td>
+                            <td>
+                                <span t-field="doc.physician_id"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong><span t-field="doc.patient_id.gov_code_label"/>:</strong>
+                            </td>
+                            <td>
+                                <span t-field="doc.patient_id.gov_code"/>
+                            </td>
+                            <td colspan="2"/>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="mb16" name="diseases">
+                    <b>Disease: </b><span t-esc="', '.join(map(lambda x: (x.code or x.name), doc.diseases_ids))"/>
+                </div>
+
+                <t t-if="doc.pregnancy_warning">
+                    <p style="font-weight: bold; color: red">Patient is Pregnant</p><br/>
+                </t>
+
+                <t t-call="acs_hms.report_prescription_table">
+                    <t t-set="prescription" t-value="doc"/>
+                </t>
+
+                <br/><br/><br/>
+                <p>
+                    <b>Advice:</b>
+                    <br/>
+                    <span t-field="doc.notes"/>
+                </p>
+                <br/>
+                <div class="row">
+                    <div class="col-6">
+                        <b>Doctor’s Stamp/Signature</b>
+                        <br/>
+                        <t t-if="doc.physician_id and doc.physician_id.signature">
+                            <img t-att-src="image_data_uri(doc.physician_id.signature)" alt="Sign" style="max-height: 100px !important;"/>
+                        </t>
+                    </div>
+
+                    <div class="col-6 pull-right" t-if="doc.sudo().company_id.acs_prescription_qrcode">
+                        <span class="float-end" style="font-size: 10px;"><b>Scan to Authenticate.</b></span><br/>
+                        <img t-if="doc.qr_image" t-att-src="image_data_uri(doc.qr_image)" alt="Logo" style="width: 100px;" class="float-end"/>
+                    </div>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
+    <template id="report_hms_prescription">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="acs_hms.report_hms_prescription_document"/>
+            </t>
+        </t>
+    </template>
+
+    <record id="report_hms_prescription_id" model="ir.actions.report">
+        <field name="name">Prescription Order</field>
+        <field name="model">prescription.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">acs_hms.report_hms_prescription</field>
+        <field name="report_file">acs_hms.report_hms_prescription</field>
+        <field name="print_report_name">(object.name or 'Prescription').replace('/','_')</field>
+        <field name="binding_model_id" ref="model_prescription_order"/>
+        <!-- <field name="groups_id" eval="[(4, ref('acs_hms.group_hms_receptionist'))]"/> -->
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

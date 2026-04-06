@@ -1,0 +1,300 @@
+<?xml version="1.0"?>
+<odoo>
+
+  <record id="patient_laboratory_test_request_form" model="ir.ui.view">
+    <field name="name">Test Requests</field>
+    <field name="model">acs.laboratory.request</field>
+    <field name="arch" type="xml">
+      <form string="Lab Requests">
+        <header>
+          <button name="button_requested" invisible="state!='draft'" string="Submit Request"
+            class="oe_highlight" type="object" />
+          <button name="button_accept" invisible="state!='requested'" string="Accept" type="object"
+            class="oe_highlight" groups="acs_laboratory.group_hms_lab_user" />
+          <button name="button_in_progress" invisible="state!='accepted'" string="In Progress"
+            class="oe_highlight" type="object" groups="acs_laboratory.group_hms_lab_user" />
+          <button name="button_done" invisible="state!='in_progress'" string="Done"
+            class="oe_highlight" type="object" groups="acs_laboratory.group_hms_lab_user" />
+          <button name="create_invoice" string="Create Invoice"
+            invisible="not acs_show_create_invoice" type="object" class="oe_highlight"
+            groups="account.group_account_invoice" />
+          <button name="button_cancel"
+            invisible="state not in ['requested','accepted','in_progress']" string="Cancel"
+            type="object" groups="acs_laboratory.group_hms_lab_user" />
+          <button name="button_draft" invisible="state!='cancel'" string="Reset To Draft"
+            type="object" groups="acs_laboratory.group_hms_lab_user" />
+          <field name="state" widget="statusbar"
+            statusbar_visible="draft,requested,accepted,in_progress,done" />
+        </header>
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button type="object" class="oe_stat_button" icon="fa-money" name="view_invoice"
+              groups="account.group_account_invoice" invisible="not invoice_id">
+              <field string="Invoices" name="invoice_count" widget="statinfo" />
+            </button>
+            <button name="action_view_test_results" string="Test Results" class="oe_stat_button"
+              icon="fa-flask" type="object"
+              invisible="state not in ['in_progress','to_invoice','done'] or acs_no_lab_result" />
+            <button name="action_view_lab_samples" string="Test Samples" class="oe_stat_button"
+              icon="fa-list" type="object" />
+          </div>
+          <h1>
+            <field name="name" class="oe_inline" />
+          </h1>
+          <group>
+            <group>
+              <field name="patient_id" readonly="state!='draft'" />
+              <field name="patient_age" readonly="state!='draft'" />
+              <field name="laboratory_group_id" readonly="state!='draft'" />
+              <field name="is_group_request" readonly="state!='draft'" />
+              <field name="group_patient_ids" widget="many2many_tags"
+                invisible="not is_group_request" required="is_group_request"
+                readonly="state!='draft'" />
+              <field name="acs_show_create_invoice" invisible="1" />
+            </group>
+            <group>
+              <field name="date" readonly="state!='draft'" />
+              <field name="physician_id" readonly="state!='draft'" />
+              <field name="collection_center_id" domain="[('is_collection_center','=',True)]"
+                groups="acs_laboratory.group_manage_collection_center" readonly="state!='draft'" />
+            </group>
+          </group>
+          <notebook>
+            <page string="Tests" name="tests" invisible="state!='draft'">
+              <field name="lab_test_ids" />
+            </page>
+            <page string="Lines" name="lines">
+              <group>
+                <field name="line_ids" nolabel="1" colspan="2" readonly="state!='draft'">
+                  <list string="Lines" editable="bottom">
+                    <field name="test_id" string="Test" />
+                    <field name="acs_tat" optional="show" />
+                    <field name="sale_price" force_save="1" readonly="not is_manager" />
+                    <field name="quantity" column_invisible="not parent.is_group_request" />
+                    <field name="instruction" />
+                    <field name="amount_total" column_invisible="not parent.is_group_request" />
+                    <field name="is_manager" column_invisible="1" />
+                  </list>
+                </field>
+                <group class="oe_subtotal_footer oe_right">
+                  <field name="total_price" />
+                </group>
+              </group>
+            </page>
+            <page string="Other Information" name="other_info">
+              <group>
+                <group>
+                  <field name="other_laboratory" readonly="state in ['done','cancel']" />
+                  <label for="laboratory_id" invisible="not other_laboratory" />
+                  <div name="other_laboratory_action" invisible="not other_laboratory">
+                    <field name="laboratory_id" invisible="not other_laboratory"
+                      required="other_laboratory" readonly="state in ['done','cancel']" />
+                    <button name="action_sendmail" type="object" string="Send mail"
+                      icon="fa-envelope" class="oe_link" invisible="not other_laboratory" />
+                    <button name="create_laboratory_bill" type="object" string="Create Bill"
+                      icon="fa-money" class="oe_link"
+                      invisible="not other_laboratory or lab_bill_id"
+                      groups="account.group_account_invoice" />
+                  </div>
+
+                  <label for="invoice_exempt" />
+                  <div name='invoice_exemption'>
+                    <field name='invoice_exempt' class="oe_inline" nolabel="1" readonly="1" />
+                    <button name="acs_apply_invoice_exemption" string="Apply/Remove" type="object"
+                      class="oe_inline fa fa-arrow-right oe_link" invisible="invoice_id"
+                      groups="acs_hms_base.group_acs_invoice_exemption" />
+                  </div>
+                  <field name="invoice_id" invisible="1" />
+                  <field name="acs_laboratory_invoice_policy" invisible="1" />
+                  <field name="payment_state" invisible="1" />
+                  <field name="acs_no_lab_result" readonly="state != 'draft'" />
+                </group>
+                <group>
+                  <field name="lab_bill_id" readonly="1"
+                    invisible="not other_laboratory or lab_bill_id"
+                    groups="account.group_account_invoice" />
+                  <label for="pricelist_id" groups="product.group_product_pricelist" />
+                  <div name='pricelist_id' groups="product.group_product_pricelist">
+                    <field name="pricelist_id" options="{'no_open':True, 'no_create': True}"
+                      class="oe_inline" readonly="state!='draft'" />
+                    <button name="acs_update_price" string="Update Price" type="object"
+                      class="oe_inline fa fa-arrow-right oe_link" invisible="not pricelist_id" />
+                  </div>
+                  <field name="company_id" groups="base.group_multi_company"
+                    options="{'no_create': True}" readonly="state!='draft'" />
+                  <field name="company_id" invisible="1" />
+                </group>
+              </group>
+            </page>
+          </notebook>
+          <field name="notes" placeholder="Notes" nolabel="1" colspan="2" readonly="state!='draft'" />
+        </sheet>
+        <chatter />
+      </form>
+    </field>
+  </record>
+
+  <record id="patient_laboratory_test_request_list" model="ir.ui.view">
+    <field name="name">Test Requests</field>
+    <field name="model">acs.laboratory.request</field>
+    <field name="arch" type="xml">
+      <list string="Test Requests" decoration-info="state=='draft'"
+        decoration-muted="state=='cancel'" decoration-danger="state=='waiting'" name="request_list">
+        <field name="name" />
+        <field name="patient_id" />
+        <field name="date" />
+        <field name="physician_id" />
+        <field name="activity_ids" widget="list_activity" optional="show" />
+        <field name="company_id" groups="base.group_multi_company" />
+        <field name="state" string="Status" decoration-info="state=='draft'"
+          decoration-muted="state=='to_invoice'" decoration-danger="state=='cancel'"
+          decoration-success="state=='done'" decoration-primary="state=='in_progress'"
+          decoration-warning="state=='requested'" decoration-it="state=='accepted'" widget="badge" />
+      </list>
+    </field>
+  </record>
+
+  <!-- <record id="view_acs_laboratory_request_search" model="ir.ui.view">
+    <field name="name">acs.laboratory.request.search</field>
+    <field name="model">acs.laboratory.request</field>
+    <field name="arch" type="xml">
+      <search string="Patient Lab Test">
+        <field name="name" />
+        <field name="patient_id" />
+        <field name="physician_id" />
+        <filter name="draft" string="Draft" domain="[('state','=','draft')]" />
+        <filter name="done" string="Done" domain="[('state','=','done')]" />
+        <filter name="invoiced" string="Invoiced" domain="[('state','=','invoiced')]" />
+        <filter name="invoice_exempt" string="Invoice Exempt"
+          domain="[('state','=','invoice_exempt')]" />
+        <filter name="today" string="Today's Investigation"
+          domain="[('date','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),
+  ('date','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))]" />
+        <filter name="tomorrow" string="Tomorrow's Investigation"
+          domain="[('date','&gt;=', datetime.datetime.combine(context_today(),
+  datetime.time(0,0,0))+relativedelta(days=1)), ('date','&lt;=',
+  datetime.datetime.combine(context_today(), datetime.time(23,59,59))+relativedelta(days=1))]" />
+        <separator />
+        <group expand="0" string="Group By">
+          <filter name="group_by_patient_id" string="Patient" context="{'group_by':'patient_id'}" />
+          <filter name="group_by_date" string="Date" context="{'group_by':'date'}" />
+          <filter name="group_by_physician" string="Doctor" context="{'group_by':'physician_id'}" />
+          <filter name="group_by_collection_center" string="Collection Center"
+            context="{'group_by':'collection_center_id'}" />
+          <filter name="group_by_company" string="Institution" context="{'group_by':'company_id'}" />
+          <filter name="group_by_state" string="Status" context="{'group_by':'state'}" />
+        </group>
+      </search>
+    </field>
+  </record> -->
+
+  <record id="view_acs_laboratory_request_calendar" model="ir.ui.view">
+    <field name="name">acs.laboratory.request.calendar</field>
+    <field name="model">acs.laboratory.request</field>
+    <field name="type">calendar</field>
+    <field name="arch" type="xml">
+      <calendar string="Patient Lab Test" color="physician_id" date_start="date">
+        <field name="physician_id" />
+        <field name="patient_id" />
+        <field name="state" />
+      </calendar>
+    </field>
+  </record>
+
+  <record id="acs_laboratory_request_pivot" model="ir.ui.view">
+    <field name="name">acs.laboratory.request.pivot</field>
+    <field name="model">acs.laboratory.request</field>
+    <field name="arch" type="xml">
+      <pivot string="Patient Lab Test">
+        <field name="date" type="row" />
+        <field name="physician_id" type="row" />
+        <field name="patient_id" type="row" />
+      </pivot>
+    </field>
+  </record>
+
+  <record id="hms_action_lab_test_request" model="ir.actions.act_window">
+    <field name="name">Lab Requests</field>
+    <field name="path">almighty-lab-request</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">acs.laboratory.request</field>
+    <field name="view_mode">list,form,calendar,pivot</field>
+    <field name="context">{'search_default_today': 1}</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+        No Record Found
+      </p>
+      <p>
+        Click to add new Lab Request.
+      </p>
+    </field>
+  </record>
+
+  <!-- Laboratory Request Group -->
+  <record id="view_laboratory_group_list" model="ir.ui.view">
+    <field name="name">laboratory.group.list</field>
+    <field name="model">laboratory.group</field>
+    <field name="arch" type="xml">
+      <list string="Line">
+        <field name="name" />
+      </list>
+    </field>
+  </record>
+
+  <record id="view_laboratory_group_form" model="ir.ui.view">
+    <field name="name">laboratory.group.form</field>
+    <field name="model">laboratory.group</field>
+    <field name="arch" type="xml">
+      <form string="Laboratory Group">
+        <sheet>
+          <div class="oe_title">
+            <label for="name" string="Name" class="oe_edit_only" />
+            <h1>
+              <field name="name" placeholder="Test Group Name" />
+            </h1>
+          </div>
+          <group>
+          </group>
+          <field name="line_ids">
+            <list string="Lines" editable="bottom">
+              <field name="test_id" string="Test" />
+              <field name="acs_tat" optional="show" />
+              <field name="sale_price" />
+              <field name="instruction" />
+            </list>
+          </field>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_laboratory_group" model="ir.actions.act_window">
+    <field name="name">Laboratory Group</field>
+    <field name="path">almighty-lab-group</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">laboratory.group</field>
+    <field name="view_mode">list,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+        No Record Found
+      </p>
+      <p>
+        Click to add new Laboratory Group.
+      </p>
+    </field>
+  </record>
+
+  <!-- View for Checkbox -->
+  <record id="patient_laboratory_test_request_form_checkbox" model="ir.ui.view">
+    <field name="name">acs.laboratory.request.tests</field>
+    <field name="model">acs.laboratory.request</field>
+    <field name="inherit_id" ref="acs_laboratory.patient_laboratory_test_request_form" />
+    <field name="arch" type="xml">
+      <!-- dummy, will be modified by py code -->
+      <field name="lab_test_ids" position="before" />
+    </field>
+  </record>
+
+  <function model="acs.lab.test" name="update_lab_test_groups_view" />
+
+</odoo>

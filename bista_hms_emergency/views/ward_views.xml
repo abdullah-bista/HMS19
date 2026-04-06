@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         WARD VIEWS
+    ============================================================ -->
+
+    <record id="view_ward_form" model="ir.ui.view">
+        <field name="name">hms.ward.form</field>
+        <field name="model">hms.ward</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_beds" type="object"
+                            class="oe_stat_button" icon="fa-bed">
+                            <div class="o_stat_info">
+                                <field name="bed_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Total Beds</span>
+                            </div>
+                        </button>
+                        <button name="action_view_beds" type="object"
+                            class="oe_stat_button" icon="fa-check-circle"
+                            context="{'search_default_available': 1}">
+                            <div class="o_stat_info">
+                                <field name="available_bed_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Available</span>
+                            </div>
+                        </button>
+                        <button name="action_view_beds" type="object"
+                            class="oe_stat_button" icon="fa-user"
+                            context="{'search_default_occupied': 1}">
+                            <div class="o_stat_info">
+                                <field name="occupied_bed_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Occupied</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Ward Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="ward_type"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1" placeholder="Internal notes..."/>
+                    </group>
+                    <notebook>
+                        <page string="Rooms" name="rooms">
+                            <field name="room_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="room_type"/>
+                                    <field name="floor"/>
+                                    <field name="bed_count" readonly="1"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ward_list" model="ir.ui.view">
+        <field name="name">hms.ward.list</field>
+        <field name="model">hms.ward</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="ward_type"/>
+                <field name="department_id"/>
+                <field name="bed_count"/>
+                <field name="available_bed_count"/>
+                <field name="occupied_bed_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ward_search" model="ir.ui.view">
+        <field name="name">hms.ward.search</field>
+        <field name="model">hms.ward</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="department_id"/>
+                <filter string="ICU" name="icu" domain="[('ward_type','=','icu')]"/>
+                <filter string="Emergency" name="emergency" domain="[('ward_type','=','emergency')]"/>
+                <filter string="General" name="general" domain="[('ward_type','=','general')]"/>
+                <filter string="Archived" name="archived" domain="[('active','=',False)]"/>
+                <group>
+                    <filter string="Ward Type" name="group_ward_type" context="{'group_by': 'ward_type'}"/>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ward" model="ir.actions.act_window">
+        <field name="name">Wards</field>
+        <field name="res_model">hms.ward</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+
+    <!-- ============================================================
+         ROOM VIEWS
+    ============================================================ -->
+
+    <record id="view_room_form" model="ir.ui.view">
+        <field name="name">hms.room.form</field>
+        <field name="model">hms.room</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Room Number/Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="ward_id"/>
+                            <field name="room_type"/>
+                            <field name="floor"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Facilities">
+                        <field name="facilities" nolabel="1" placeholder="e.g., AC, TV, Attached Bath..."/>
+                    </group>
+                    <notebook>
+                        <page string="Beds" name="beds">
+                            <field name="bed_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="bed_type"/>
+                                    <field name="state" widget="badge"
+                                        decoration-success="state == 'available'"
+                                        decoration-danger="state == 'occupied'"
+                                        decoration-warning="state == 'maintenance'"
+                                        decoration-info="state == 'reserved'"/>
+                                    <field name="daily_rate"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_room_list" model="ir.ui.view">
+        <field name="name">hms.room.list</field>
+        <field name="model">hms.room</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="ward_id"/>
+                <field name="room_type"/>
+                <field name="floor"/>
+                <field name="bed_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_room_search" model="ir.ui.view">
+        <field name="name">hms.room.search</field>
+        <field name="model">hms.room</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="ward_id"/>
+                <filter string="Private" name="private" domain="[('room_type','=','private')]"/>
+                <filter string="Isolation" name="isolation" domain="[('room_type','=','isolation')]"/>
+                <filter string="Archived" name="archived" domain="[('active','=',False)]"/>
+                <group>
+                    <filter string="Ward" name="group_ward" context="{'group_by': 'ward_id'}"/>
+                    <filter string="Room Type" name="group_type" context="{'group_by': 'room_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_room" model="ir.actions.act_window">
+        <field name="name">Rooms</field>
+        <field name="res_model">hms.room</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Diseases -->
+        <record id="category_bacterial" model="diseases.category">
+            <field name="name">Bacterial</field>
+        </record>
+
+        <record id="category_viral" model="diseases.category">
+            <field name="name">Viral</field>
+        </record>
+
+        <record id="category_fungal" model="diseases.category">
+            <field name="name">Fungal</field>
+        </record>
+
+        <record id="category_parasitic" model="diseases.category">
+            <field name="name">Parasitic</field>
+        </record>
+
+        <record id="category_other" model="diseases.category">
+            <field name="name">Other Category Disease</field>
+        </record>
+    </data>
+</odoo>

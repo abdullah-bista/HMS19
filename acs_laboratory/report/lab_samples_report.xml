@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="lab_sample_report">
+        <div style="width:380px;float:left;margin:0 40px;font-size:16px;margin-bottom:0px;border:0px solid #fff;margin-left:10px;">
+            <div class="row">
+                <div class="col-3">
+                    <b><span style="font-size:22px;" t-esc="lab.name"/></b>
+                </div>
+                <div class="col-8">
+                    <div t-if="lab.name" t-field="lab.name" class="barcode" t-options="{'widget': 'barcode', 'symbology': 'Code128', 'width': 380, 'height': 52, 'img_align': 'center'}"/>
+                </div>
+            </div>
+
+            <strong>Patient:-</strong> <span t-field="lab.patient_id.name"/> [<span t-field="lab.patient_id.code"/>]<br/>
+            <strong>Birthdate:-</strong> <span t-field="lab.patient_id.birthday"/> (Age: <span t-field="lab.patient_id.age"/>)<br/>
+            <strong>Lab Request:-</strong> <span t-field="lab.request_id"/><br/>
+            <strong>Lab Tests:-</strong> <span t-field="lab.test_ids"/><br/>
+            <strong>Date:-</strong> <span t-field="lab.date"/><br/>
+            <strong>Sample Container Code:-</strong> <span t-field="lab.container_name"/>
+        </div>
+    </template>
+
+    <template id="report_lab_barcode_label">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc"> 
+                <t t-call="web.basic_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <t t-call="acs_laboratory.lab_sample_report">
+                            <t t-set="lab" t-value="doc"/>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="acs_lab_sample_report" model="ir.actions.report">
+        <field name="name">LAB Sample</field>
+        <field name="model">acs.patient.laboratory.sample</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">acs_laboratory.report_lab_barcode_label</field>
+        <field name="report_file">acs_laboratory.report_lab_barcode_label</field>
+        <field name="binding_model_id" ref="model_acs_patient_laboratory_sample"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

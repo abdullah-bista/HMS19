@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_hms_patient_medication_list" model="ir.ui.view">
+        <field name="name">hms.patient.medication.list</field>
+        <field name="model">hms.patient.medication</field>
+        <field name="arch" type="xml">
+            <list string="Patient Medication">
+                <field name="patient_id"/>
+                <field name="physician_id"/>
+                <field name="adverse_reaction"/>
+                <field name="notes"/>
+                <field name="is_active"/>
+                <field name="course_completed"/>
+                <field name="product_id"/>
+                <field name="discontinued_reason"/>
+                <field name="discontinued"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hms_patient_medication_form" model="ir.ui.view">
+        <field name="name">hms.patient.medication.form</field>
+        <field name="model">hms.patient.medication</field>
+        <field name="arch" type="xml">
+            <form string="ACS Patient Medication">
+                <field name="patient_id"/>
+                <field name="physician_id"/>
+                <field name="adverse_reaction"/>
+                <field name="notes"/>
+                <field name="is_active"/>
+                <field name="course_completed"/>
+                <field name="product_id"/>
+                <field name="discontinued_reason"/>
+                <field name="discontinued"/>
+            </form>
+        </field>
+    </record>
+    <record id="view_hms_patient_medication_search" model="ir.ui.view">
+        <field name="name">hms.patient.medication.search</field>
+        <field name="model">hms.patient.medication</field>
+        <field name="arch" type="xml">
+            <search string="ACS Patient Medication">
+                <field name="patient_id"/>
+                <field name="physician_id"/>
+                <field name="adverse_reaction"/>
+                <field name="notes"/>
+                <field name="is_active"/>
+                <field name="course_completed"/>
+                <field name="product_id"/>
+                <field name="discontinued_reason"/>
+                <field name="discontinued"/>
+
+                <separator/>
+
+                <!-- Group By (Odoo 19 style) -->
+                <filter string="Group by Patient" name="group_patient" context="{'group_by':'patient_id'}"/>
+                <filter string="Group by Physician" name="group_physician" context="{'group_by':'physician_id'}"/>
+                <filter string="Group by Active" name="group_is_active" context="{'group_by':'is_active'}"/>
+                <filter string="Group by Course Completed" name="group_course_completed" context="{'group_by':'course_completed'}"/>
+                <filter string="Group by Medication Product" name="group_product" context="{'group_by':'product_id'}"/>
+                <filter string="Group by Discontinued" name="group_discontinued" context="{'group_by':'discontinued'}"/>
+            </search>
+        </field>
+    </record>
+
+
+    <record model="ir.actions.act_window" id="act_open_hms_patient_medication_view">
+        <field name="name">Patient Medication</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hms.patient.medication</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_hms_patient_medication_search"/>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+
+</odoo>

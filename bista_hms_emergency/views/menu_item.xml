@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         TOP LEVEL MENUS
+    ============================================================ -->
+
+    <menuitem id="menu_bista_emergency_root"
+              name="Emergency"
+              sequence="60"/>
+
+    <menuitem id="menu_bista_ipd_root"
+              name="IPD"
+              sequence="61"/>
+
+    <!-- ============================================================
+         EMERGENCY MENU ITEMS
+    ============================================================ -->
+
+    <menuitem id="menu_bista_reception"
+              name="Reception / Check-In"
+              parent="menu_bista_emergency_root"
+              action="bista_hms_emergency.action_reception"
+              sequence="5"/>
+
+    <menuitem id="menu_bista_reception_pending"
+              name="Pending Check-Ins"
+              parent="menu_bista_emergency_root"
+              action="bista_hms_emergency.action_reception_pending"
+              sequence="6"/>
+
+    <menuitem id="menu_bista_er_cases"
+              name="Emergency Cases"
+              parent="menu_bista_emergency_root"
+              action="bista_hms_emergency.action_emergency_case"
+              sequence="10"/>
+
+    <menuitem id="menu_bista_er_triage_queue"
+              name="Triage Queue"
+              parent="menu_bista_emergency_root"
+              action="bista_hms_emergency.action_emergency_triage_queue"
+              sequence="20"/>
+
+    <menuitem id="menu_bista_er_active_treatment"
+              name="Active Treatment"
+              parent="menu_bista_emergency_root"
+              action="bista_hms_emergency.action_emergency_active_treatment"
+              sequence="30"/>
+
+    <menuitem id="menu_bista_er_discharges"
+              name="ER Discharges"
+              parent="menu_bista_emergency_root"
+              action="bista_hms_emergency.action_emergency_discharges"
+              sequence="40"/>
+
+    <!-- ============================================================
+         IPD — ADMISSIONS
+    ============================================================ -->
+
+    <menuitem id="menu_bista_ipd_admissions"
+              name="Admissions"
+              parent="menu_bista_ipd_root"
+              sequence="10"/>
+
+    <menuitem id="menu_bista_ipd_all_admissions"
+              name="All Admissions"
+              parent="menu_bista_ipd_admissions"
+              action="bista_hms_emergency.action_admission"
+              sequence="10"/>
+
+    <menuitem id="menu_bista_ipd_current_admissions"
+              name="Current Admissions"
+              parent="menu_bista_ipd_admissions"
+              action="bista_hms_emergency.action_admission_current"
+              sequence="20"/>
+
+    <menuitem id="menu_bista_ipd_pending_discharge"
+              name="Pending Discharge"
+              parent="menu_bista_ipd_admissions"
+              action="bista_hms_emergency.action_admission_pending_discharge"
+              sequence="30"/>
+
+    <!-- ============================================================
+         IPD — DISCHARGES
+    ============================================================ -->
+
+    <menuitem id="menu_bista_ipd_discharges"
+              name="Discharges"
+              parent="menu_bista_ipd_root"
+              sequence="15"/>
+
+    <menuitem id="menu_bista_ipd_all_discharges"
+              name="All Discharges"
+              parent="menu_bista_ipd_discharges"
+              action="bista_hms_emergency.action_discharge"
+              sequence="10"/>
+
+    <menuitem id="menu_bista_ipd_discharge_pending_payment"
+              name="Pending Payment"
+              parent="menu_bista_ipd_discharges"
+              action="bista_hms_emergency.action_discharge_pending_payment"
+              sequence="20"/>
+
+    <menuitem id="menu_bista_ipd_discharge_pending_approval"
+              name="Pending Approval"
+              parent="menu_bista_ipd_discharges"
+              action="bista_hms_emergency.action_discharge_pending_approval"
+              sequence="30"/>
+
+    <!-- ============================================================
+         IPD — OPERATION THEATRE
+    ============================================================ -->
+
+    <menuitem id="menu_bista_ipd_ot"
+              name="Operation Theatre"
+              parent="menu_bista_ipd_root"
+              sequence="25"/>
+
+    <menuitem id="menu_bista_ot_all"
+              name="All OT Bookings"
+              parent="menu_bista_ipd_ot"
+              action="bista_hms_emergency.action_ot_booking"
+              sequence="10"/>
+
+    <menuitem id="menu_bista_ot_scheduled"
+              name="Scheduled"
+              parent="menu_bista_ipd_ot"
+              action="bista_hms_emergency.action_ot_scheduled"
+              sequence="20"/>
+
+    <!-- ============================================================
+         IPD — BED MANAGEMENT
+    ============================================================ -->
+
+    <menuitem id="menu_bista_ipd_bed_mgmt"
+              name="Bed Management"
+              parent="menu_bista_ipd_root"
+              sequence="20"/>
+
+    <menuitem id="menu_bista_bed_availability"
+              name="Bed Availability Board"
+              parent="menu_bista_ipd_bed_mgmt"
+              action="bista_hms_emergency.action_bed_kanban"
+              sequence="10"/>
+
+    <menuitem id="menu_bista_all_beds"
+              name="All Beds"
+              parent="menu_bista_ipd_bed_mgmt"
+              action="bista_hms_emergency.action_bed"
+              sequence="20"/>
+
+    <!-- ============================================================
+         IPD — NURSING
+    ============================================================ -->
+
+    <menuitem
+            id="menu_bista_ipd_nursing"
+            name="Nursing"
+            parent="menu_bista_ipd_root"
+            sequence="30"/>
+
+    <menuitem id="menu_bista_nursing_sheets"
+              name="Nursing Sheets"
+              parent="menu_bista_ipd_nursing"
+              action="bista_hms_emergency.action_nursing_sheet"
+              sequence="10"/>
+
+    <menuitem id="menu_bista_nursing_my_shift"
+              name="My Shift Today"
+              parent="menu_bista_ipd_nursing"
+              action="bista_hms_emergency.action_nursing_sheet_my_shift"
+              sequence="20"/>
+
+    <menuitem id="menu_bista_nursing_pending_review"
+              name="Pending Review"
+              parent="menu_bista_ipd_nursing"
+              action="bista_hms_emergency.action_nursing_sheet_pending_review"
+              sequence="30"/>
+
+    <!-- ============================================================
+         CONFIGURATION
+    ============================================================ -->
+
+    <menuitem id="menu_bista_configuration"
+              name="Configuration"
+              parent="menu_bista_ipd_root"
+              sequence="100"/>
+
+    <menuitem id="menu_bista_config_wards"
+              name="Wards"
+              parent="menu_bista_configuration"
+              action="bista_hms_emergency.action_ward"
+              sequence="10"/>
+
+    <menuitem id="menu_bista_config_rooms"
+              name="Rooms"
+              parent="menu_bista_configuration"
+              action="bista_hms_emergency.action_room"
+              sequence="20"/>
+
+    <menuitem id="menu_bista_config_beds"
+              name="Beds"
+              parent="menu_bista_configuration"
+              action="bista_hms_emergency.action_bed"
+              sequence="30"/>
+
+</odoo>

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ============================================================
+             SECURITY GROUPS
+        ============================================================ -->
+
+        <!-- Emergency Groups -->
+        <record id="group_emergency_user" model="res.groups">
+            <field name="name">Emergency User</field>
+            <field name="implied_ids" eval="[(4, ref('acs_hms.group_hms_receptionist'))]"/>
+        </record>
+
+        <record id="group_emergency_manager" model="res.groups">
+            <field name="name">Emergency Manager</field>
+            <field name="implied_ids" eval="[(4, ref('bista_hms_emergency.group_emergency_user'))]"/>
+        </record>
+
+        <!-- IPD Groups -->
+        <record id="group_ipd_user" model="res.groups">
+            <field name="name">IPD User</field>
+            <field name="implied_ids" eval="[(4, ref('acs_hms.group_hms_nurse'))]"/>
+        </record>
+
+        <record id="group_ipd_manager" model="res.groups">
+            <field name="name">IPD Manager</field>
+            <field name="implied_ids" eval="[(4, ref('bista_hms_emergency.group_ipd_user'))]"/>
+        </record>
+
+        <!-- Nursing Groups -->
+        <record id="group_nursing_user" model="res.groups">
+            <field name="name">Nursing User</field>
+            <field name="implied_ids" eval="[(4, ref('acs_hms.group_hms_nurse'))]"/>
+        </record>
+
+        <record id="group_nursing_manager" model="res.groups">
+            <field name="name">Nursing Manager</field>
+            <field name="implied_ids" eval="[(4, ref('bista_hms_emergency.group_nursing_user'))]"/>
+        </record>
+
+        <!-- Reception Groups -->
+        <record id="group_reception_user" model="res.groups">
+            <field name="name">Reception User</field>
+            <field name="implied_ids" eval="[(4, ref('acs_hms.group_hms_receptionist'))]"/>
+        </record>
+
+        <record id="group_reception_manager" model="res.groups">
+            <field name="name">Reception Manager</field>
+            <field name="implied_ids" eval="[(4, ref('bista_hms_emergency.group_reception_user'))]"/>
+        </record>
+
+        <!-- OT Groups -->
+        <record id="group_ot_user" model="res.groups">
+            <field name="name">OT User</field>
+            <field name="implied_ids" eval="[(4, ref('acs_hms_base.group_hms_user'))]"/>
+        </record>
+
+        <record id="group_ot_manager" model="res.groups">
+            <field name="name">OT Manager</field>
+            <field name="implied_ids" eval="[(4, ref('bista_hms_emergency.group_ot_user'))]"/>
+        </record>
+
+        <!-- ============================================================
+             RECORD RULES — Phase 1 (Ward/Bed multi-company only)
+             Detailed per-model rules are added in subsequent phases.
+        ============================================================ -->
+
+        <record id="rule_ward_company" model="ir.rule">
+            <field name="name">Ward: Multi-Company</field>
+            <field name="model_id" ref="model_hms_ward"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_room_company" model="ir.rule">
+            <field name="name">Room: Multi-Company</field>
+            <field name="model_id" ref="model_hms_room"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_bed_company" model="ir.rule">
+            <field name="name">Bed: Multi-Company</field>
+            <field name="model_id" ref="model_hms_bed"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- ============================================================
+             RECORD RULES — Emergency Case (Phase 2)
+        ============================================================ -->
+
+        <record id="rule_emergency_case_dept" model="ir.rule">
+            <field name="name">ER Cases: Department</field>
+            <field name="model_id" ref="model_hms_emergency_case"/>
+            <field name="domain_force">[('department_id', 'in', user.department_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('bista_hms_emergency.group_emergency_user'))]"/>
+        </record>
+
+        <record id="rule_emergency_case_all" model="ir.rule">
+            <field name="name">ER Cases: All</field>
+            <field name="model_id" ref="model_hms_emergency_case"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('bista_hms_emergency.group_emergency_manager'))]"/>
+        </record>
+
+        <record id="rule_emergency_case_company" model="ir.rule">
+            <field name="name">ER Cases: Multi-Company</field>
+            <field name="model_id" ref="model_hms_emergency_case"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- ============================================================
+             RECORD RULES — Admission (Phase 3)
+        ============================================================ -->
+
+        <record id="rule_admission_ward" model="ir.rule">
+            <field name="name">Admissions: Ward/Department</field>
+            <field name="model_id" ref="model_hms_admission"/>
+            <field name="domain_force">['|', ('ward_id.department_id', '=', False), ('ward_id.department_id', 'in', user.department_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('bista_hms_emergency.group_ipd_user'))]"/>
+        </record>
+
+        <record id="rule_admission_all" model="ir.rule">
+            <field name="name">Admissions: All</field>
+            <field name="model_id" ref="model_hms_admission"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('bista_hms_emergency.group_ipd_manager'))]"/>
+        </record>
+
+        <record id="rule_admission_company" model="ir.rule">
+            <field name="name">Admissions: Multi-Company</field>
+            <field name="model_id" ref="model_hms_admission"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- ============================================================
+             RECORD RULES — Nursing (Phase 4)
+        ============================================================ -->
+
+        <record id="rule_nursing_sheet_own" model="ir.rule">
+            <field name="name">Nursing Sheet: Own</field>
+            <field name="model_id" ref="model_hms_nursing_sheet"/>
+            <field name="domain_force">[('nurse_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('bista_hms_emergency.group_nursing_user'))]"/>
+        </record>
+
+        <record id="rule_nursing_sheet_all" model="ir.rule">
+            <field name="name">Nursing Sheet: All</field>
+            <field name="model_id" ref="model_hms_nursing_sheet"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('bista_hms_emergency.group_nursing_manager'))]"/>
+        </record>
+
+        <record id="rule_nursing_sheet_company" model="ir.rule">
+            <field name="name">Nursing Sheet: Multi-Company</field>
+            <field name="model_id" ref="model_hms_nursing_sheet"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- ============================================================
+             RECORD RULES — Discharge (Phase 5)
+        ============================================================ -->
+
+        <record id="rule_discharge_ipd_user" model="ir.rule">
+            <field name="name">Discharge: IPD User</field>
+            <field name="model_id" ref="model_hms_discharge"/>
+            <field name="domain_force">[('discharge_type', '=', 'ipd')]</field>
+            <field name="groups" eval="[(4, ref('bista_hms_emergency.group_ipd_user'))]"/>
+        </record>
+
+        <record id="rule_discharge_ipd_all" model="ir.rule">
+            <field name="name">Discharge: IPD All</field>
+            <field name="model_id" ref="model_hms_discharge"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('bista_hms_emergency.group_ipd_manager'))]"/>
+        </record>
+
+        <record id="rule_discharge_er_user" model="ir.rule">
+            <field name="name">Discharge: ER User</field>
+            <field name="model_id" ref="model_hms_discharge"/>
+            <field name="domain_force">[('discharge_type', '=', 'emergency')]</field>
+            <field name="groups" eval="[(4, ref('bista_hms_emergency.group_emergency_user'))]"/>
+        </record>
+
+        <record id="rule_discharge_er_all" model="ir.rule">
+            <field name="name">Discharge: ER All</field>
+            <field name="model_id" ref="model_hms_discharge"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('bista_hms_emergency.group_emergency_manager'))]"/>
+        </record>
+
+        <record id="rule_discharge_company" model="ir.rule">
+            <field name="name">Discharge: Multi-Company</field>
+            <field name="model_id" ref="model_hms_discharge"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- ============================================================
+             RECORD RULES — Reception
+        ============================================================ -->
+
+        <record id="rule_reception_company" model="ir.rule">
+            <field name="name">Reception: Multi-Company</field>
+            <field name="model_id" ref="model_hms_reception"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- ============================================================
+             RECORD RULES — Operation Theatre
+        ============================================================ -->
+
+        <record id="rule_ot_company" model="ir.rule">
+            <field name="name">OT: Multi-Company</field>
+            <field name="model_id" ref="model_hms_operation_theatre"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+    </data>
+</odoo>

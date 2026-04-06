@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         FORM VIEW
+    ============================================================ -->
+
+    <record id="view_hms_discharge_form" model="ir.ui.view">
+        <field name="name">hms.discharge.form</field>
+        <field name="model">hms.discharge</field>
+        <field name="arch" type="xml">
+            <form string="Discharge Record">
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                        class="btn-primary"
+                        invisible="state != 'draft'"/>
+                    <button name="action_billing_cleared" string="Mark Billing Cleared" type="object"
+                        class="btn-primary"
+                        invisible="state != 'pending_payment'"/>
+                    <button name="action_approve" string="Approve Discharge" type="object"
+                        class="btn-primary"
+                        invisible="state != 'pending_approval'"/>
+                    <button name="action_complete" string="Complete / Release Patient" type="object"
+                        class="btn-primary"
+                        invisible="state != 'approved'"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="draft,pending_payment,pending_approval,approved,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Discharge Source">
+                            <field name="discharge_type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="patient_id" readonly="state != 'draft'"/>
+                            <field name="admission_id"
+                                invisible="discharge_type != 'ipd'"
+                                readonly="state != 'draft'"
+                                domain="[('state', 'in', ('confirmed', 'in_progress')), ('patient_id', '=', patient_id)]"/>
+                            <field name="emergency_case_id"
+                                invisible="discharge_type != 'emergency'"
+                                readonly="state != 'draft'"
+                                domain="[('state', 'in', ('treatment', 'observation')), ('patient_id', '=', patient_id)]"/>
+                        </group>
+                        <group string="Discharge Details">
+                            <field name="discharge_datetime" readonly="state != 'draft'"/>
+                            <field name="physician_id" readonly="state != 'draft'"/>
+                            <field name="discharge_condition" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Diagnoses">
+                            <group>
+                                <field name="admission_diagnosis" readonly="state != 'draft'"/>
+                                <field name="discharge_diagnosis" readonly="state != 'draft'"/>
+                            </group>
+                            <field name="diagnosis_ids" widget="many2many_tags" readonly="state != 'draft'"/>
+                        </page>
+
+                        <page string="Clinical Summary">
+                            <field name="treatment_summary" readonly="state != 'draft'"/>
+                            <field name="procedures_summary" readonly="state != 'draft'"/>
+                            <field name="investigation_summary" readonly="state != 'draft'"/>
+                            <separator string="Discharge Medications"/>
+                            <field name="discharge_medications" readonly="state != 'draft'"/>
+                        </page>
+
+                        <page string="Follow-up &amp; Instructions">
+                            <group>
+                                <group string="Follow-up">
+                                    <field name="follow_up_date" readonly="state != 'draft'"/>
+                                    <field name="follow_up_physician_id" readonly="state != 'draft'"/>
+                                </group>
+                            </group>
+                            <field name="follow_up_instructions" readonly="state != 'draft'"/>
+                            <separator string="Patient Instructions"/>
+                            <group>
+                                <field name="diet_instructions" readonly="state != 'draft'"/>
+                                <field name="activity_restrictions" readonly="state != 'draft'"/>
+                                <field name="warning_signs" readonly="state != 'draft'"/>
+                            </group>
+                        </page>
+
+                        <page string="Billing &amp; Approval">
+                            <group>
+                                <group string="Billing">
+                                    <field name="billing_cleared" readonly="state not in ('pending_payment', 'draft')"/>
+                                    <field name="billing_remarks" readonly="state not in ('pending_payment', 'draft')"/>
+                                </group>
+                                <group string="Approval">
+                                    <field name="approved_by" readonly="1"/>
+                                    <field name="approval_datetime" readonly="1"/>
+                                </group>
+                            </group>
+                            <group string="Release">
+                                <field name="released_by" readonly="1"/>
+                                <field name="release_datetime" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         LIST VIEW
+    ============================================================ -->
+
+    <record id="view_hms_discharge_list" model="ir.ui.view">
+        <field name="name">hms.discharge.list</field>
+        <field name="model">hms.discharge</field>
+        <field name="arch" type="xml">
+            <list string="Discharges" decoration-success="state == 'completed'"
+                  decoration-info="state in ('pending_payment', 'pending_approval', 'approved')"
+                  decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="discharge_type"/>
+                <field name="discharge_datetime"/>
+                <field name="physician_id"/>
+                <field name="discharge_condition"/>
+                <field name="billing_cleared" optional="show"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         SEARCH VIEW
+    ============================================================ -->
+
+    <record id="view_hms_discharge_search" model="ir.ui.view">
+        <field name="name">hms.discharge.search</field>
+        <field name="model">hms.discharge</field>
+        <field name="arch" type="xml">
+            <search string="Search Discharges">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="physician_id"/>
+                <filter string="IPD" name="filter_ipd" domain="[('discharge_type', '=', 'ipd')]"/>
+                <filter string="Emergency" name="filter_emergency" domain="[('discharge_type', '=', 'emergency')]"/>
+                <separator/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Pending Payment" name="filter_pending_payment" domain="[('state', '=', 'pending_payment')]"/>
+                <filter string="Pending Approval" name="filter_pending_approval" domain="[('state', '=', 'pending_approval')]"/>
+                <filter string="Approved" name="filter_approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Completed" name="filter_completed" domain="[('state', '=', 'completed')]"/>
+                <separator/>
+                <filter string="Billing Not Cleared" name="filter_billing_pending"
+                    domain="[('billing_cleared', '=', False), ('state', '!=', 'draft')]"/>
+                <group>
+                    <filter string="Discharge Type" name="group_type" context="{'group_by': 'discharge_type'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Physician" name="group_physician" context="{'group_by': 'physician_id'}"/>
+                    <filter string="Discharge Date" name="group_date" context="{'group_by': 'discharge_datetime:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         ACTIONS
+    ============================================================ -->
+
+    <record id="action_discharge" model="ir.actions.act_window">
+        <field name="name">All Discharges</field>
+        <field name="res_model">hms.discharge</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_hms_discharge_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No discharges recorded yet.</p>
+            <p>Create a discharge record to begin the discharge process.</p>
+        </field>
+    </record>
+
+    <record id="action_discharge_pending_payment" model="ir.actions.act_window">
+        <field name="name">Pending Payment</field>
+        <field name="res_model">hms.discharge</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'pending_payment')]</field>
+        <field name="search_view_id" ref="view_hms_discharge_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No discharges pending payment.</p>
+        </field>
+    </record>
+
+    <record id="action_discharge_pending_approval" model="ir.actions.act_window">
+        <field name="name">Pending Approval</field>
+        <field name="res_model">hms.discharge</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'in', ('pending_approval', 'approved'))]</field>
+        <field name="search_view_id" ref="view_hms_discharge_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No discharges pending approval.</p>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         DISCHARGE SMART BUTTON — Admission form inherit
+    ============================================================ -->
+
+    <record id="view_admission_form_discharge_btn" model="ir.ui.view">
+        <field name="name">hms.admission.form.discharge.btn</field>
+        <field name="model">hms.admission</field>
+        <field name="inherit_id" ref="bista_hms_emergency.view_admission_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button type="object" name="action_view_discharge"
+                    class="oe_stat_button" icon="fa-sign-out"
+                    invisible="discharge_id == False">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Discharge</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

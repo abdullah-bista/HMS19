@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="email_template_birthday_wish" model="mail.template">
+            <field name="name">Birthday Wish</field>
+            <field name="model_id" ref="model_hms_patient"/>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="subject">🎉 Happy Birthday, {{ object.name }}! 🎂</field>
+            <field name="body_html" type="html">
+                <link href="https://fonts.googleapis.com/css?family=Pacifico|Roboto" rel="stylesheet"/>
+                <div style="background-color: #f9f9f9; padding: 20px; text-align: center; font-family: 'Roboto', sans-serif;">
+                    <h2 style="color: #7b1b21; font-size: 32px; font-family: 'Pacifico', cursive; margin-bottom: 5px;">
+                        🎈 Happy Birthday! 🎈
+                    </h2>
+                    <h3 style="color: #333; font-size: 20px; margin: 0;">
+                        Wishing you all the joy and happiness, <t t-esc="object.name"/>!
+                    </h3>
+
+                    <!-- Image Section -->
+                    <div style="margin-top: 20px;">
+                        <img src="https://www.almightycs.com/birthday.jpg?w=826" 
+                            alt="Birthday Cake" 
+                            style="width: 100%; max-width: 500px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);"/>
+                    </div>
+
+                    <!-- Message Section -->
+                    <div style="margin-top: 20px; color: #555; font-size: 16px; line-height: 1.6;">
+                        <p>We hope your special day is filled with love, laughter, and delightful surprises!</p>
+                        <p><strong>From all of us at <t t-esc="user.company_id.name"/> 🎉</strong></p>
+                    </div>
+
+                    <!-- Footer Section -->
+                    <footer style="margin-top: 20px; font-size: 14px; color: #888;">
+                        <p style="margin: 0;">Sent with ❤️ by <t t-esc="user.company_id.name"/></p>
+                    </footer>
+                </div>
+            </field>
+        </record>
+
+        <record forcecreate="True" id="ir_cron_birth" model="ir.cron">
+            <field name="name">Birthday scheduler</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="state">code</field>
+            <field name="model_id" ref="model_hms_patient"/>
+            <field name="code">model.send_birthday_email()</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,26 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hms_ward_user,hms.ward user,model_hms_ward,acs_hms_base.group_hms_user,1,0,0,0
+access_hms_ward_ipd_manager,hms.ward ipd manager,model_hms_ward,bista_hms_emergency.group_ipd_manager,1,1,1,1
+access_hms_room_user,hms.room user,model_hms_room,acs_hms_base.group_hms_user,1,0,0,0
+access_hms_room_ipd_manager,hms.room ipd manager,model_hms_room,bista_hms_emergency.group_ipd_manager,1,1,1,1
+access_hms_bed_user,hms.bed user,model_hms_bed,acs_hms_base.group_hms_user,1,0,0,0
+access_hms_bed_ipd_user,hms.bed ipd user,model_hms_bed,bista_hms_emergency.group_ipd_user,1,1,0,0
+access_hms_bed_ipd_manager,hms.bed ipd manager,model_hms_bed,bista_hms_emergency.group_ipd_manager,1,1,1,1
+access_hms_emergency_case_user,hms.emergency.case user,model_hms_emergency_case,bista_hms_emergency.group_emergency_user,1,1,1,0
+access_hms_emergency_case_manager,hms.emergency.case manager,model_hms_emergency_case,bista_hms_emergency.group_emergency_manager,1,1,1,1
+access_hms_admission_ipd_user,hms.admission ipd user,model_hms_admission,bista_hms_emergency.group_ipd_user,1,1,1,0
+access_hms_admission_ipd_manager,hms.admission ipd manager,model_hms_admission,bista_hms_emergency.group_ipd_manager,1,1,1,1
+access_hms_nursing_sheet_nursing_user,hms.nursing.sheet nursing user,model_hms_nursing_sheet,bista_hms_emergency.group_nursing_user,1,1,1,0
+access_hms_nursing_sheet_nursing_manager,hms.nursing.sheet nursing manager,model_hms_nursing_sheet,bista_hms_emergency.group_nursing_manager,1,1,1,1
+access_hms_nursing_vitals_nursing_user,hms.nursing.vitals nursing user,model_hms_nursing_vitals,bista_hms_emergency.group_nursing_user,1,1,1,0
+access_hms_nursing_vitals_nursing_manager,hms.nursing.vitals nursing manager,model_hms_nursing_vitals,bista_hms_emergency.group_nursing_manager,1,1,1,1
+access_hms_discharge_ipd_user,hms.discharge ipd user,model_hms_discharge,bista_hms_emergency.group_ipd_user,1,1,1,0
+access_hms_discharge_ipd_manager,hms.discharge ipd manager,model_hms_discharge,bista_hms_emergency.group_ipd_manager,1,1,1,1
+access_hms_discharge_emergency_user,hms.discharge emergency user,model_hms_discharge,bista_hms_emergency.group_emergency_user,1,1,1,0
+access_hms_discharge_emergency_manager,hms.discharge emergency manager,model_hms_discharge,bista_hms_emergency.group_emergency_manager,1,1,1,1
+access_hms_reception_user,hms.reception user,model_hms_reception,bista_hms_emergency.group_reception_user,1,1,1,0
+access_hms_reception_manager,hms.reception manager,model_hms_reception,bista_hms_emergency.group_reception_manager,1,1,1,1
+access_hms_operation_theatre_user,hms.operation.theatre user,model_hms_operation_theatre,bista_hms_emergency.group_ot_user,1,1,1,0
+access_hms_operation_theatre_manager,hms.operation.theatre manager,model_hms_operation_theatre,bista_hms_emergency.group_ot_manager,1,1,1,1
+access_hms_triage_vitals_user,hms.triage.vitals user,model_hms_triage_vitals,bista_hms_emergency.group_emergency_user,1,1,1,0
+access_hms_triage_vitals_manager,hms.triage.vitals manager,model_hms_triage_vitals,bista_hms_emergency.group_emergency_manager,1,1,1,1

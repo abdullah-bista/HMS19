@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         ADMISSION FORM VIEW
+    ============================================================ -->
+
+    <record id="view_admission_form" model="ir.ui.view">
+        <field name="name">hms.admission.form</field>
+        <field name="model">hms.admission</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object"
+                        invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_admit" string="Admit Patient" type="object"
+                        invisible="state != 'confirmed'" class="btn-primary"/>
+                    <button name="action_mark_treatment_done" string="Mark Treatment Done" type="object"
+                        invisible="state != 'in_progress'" class="btn-primary"/>
+                    <button name="action_initiate_discharge" string="Discharge" type="object"
+                        invisible="state not in ('in_progress', 'treatment_done')"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                        invisible="state in ('discharged', 'cancelled')"
+                        confirm="Are you sure you want to cancel this admission?"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="draft,confirmed,in_progress,treatment_done,discharged"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoices" type="object"
+                            class="oe_stat_button" icon="fa-money"
+                            invisible="invoice_count == 0">
+                            <div class="o_stat_info">
+                                <field name="invoice_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Invoices</span>
+                            </div>
+                        </button>
+                        <button name="action_create_invoice" type="object"
+                            class="oe_stat_button" icon="fa-plus"
+                            invisible="state not in ('in_progress', 'discharged')">
+                            <span class="o_stat_text">Create Invoice</span>
+                        </button>
+                        <button name="action_view_ot_bookings" type="object"
+                            class="oe_stat_button" icon="fa-hospital-o">
+                            <div class="o_stat_info">
+                                <field name="ot_booking_count" class="o_stat_value"/>
+                                <span class="o_stat_text">OT Bookings</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <!-- Current Admission Banner -->
+                    <div class="alert alert-info" role="alert"
+                        invisible="state != 'in_progress'">
+                        <i class="fa fa-hospital-o me-2"/>
+                        Patient is currently admitted.
+                        <span invisible="not length_of_stay">
+                            Length of stay: <strong><field name="length_of_stay" nolabel="1"/> day(s)</strong>
+                        </span>
+                    </div>
+
+                    <group>
+                        <group string="Patient &amp; Admission">
+                            <field name="patient_id" options="{'no_create': True}"/>
+                            <field name="admission_datetime"/>
+                            <field name="admission_type"/>
+                            <field name="emergency_case_id" options="{'no_create': True}"
+                                invisible="admission_type != 'emergency'"/>
+                        </group>
+                        <group string="Physicians">
+                            <field name="attending_physician_id" options="{'no_create': True}"/>
+                            <field name="referring_physician_id" options="{'no_create': True}"/>
+                            <field name="secondary_physician_ids" widget="many2many_tags"
+                                options="{'no_create': True}"/>
+                        </group>
+                    </group>
+
+                    <group string="Reason for Admission">
+                        <field name="admission_reason" nolabel="1"
+                            placeholder="Clinical indication for admission..."/>
+                    </group>
+
+                    <!-- Bed Assignment -->
+                    <group string="Bed Assignment">
+                        <group>
+                            <field name="ward_id"
+                                options="{'no_create': True}"
+                                readonly="state in ('in_progress', 'discharged', 'cancelled')"/>
+                            <field name="room_id"
+                                domain="[('ward_id', '=', ward_id)]"
+                                options="{'no_create': True}"
+                                readonly="state in ('in_progress', 'discharged', 'cancelled')"/>
+                            <field name="bed_id"
+                                domain="[('room_id', '=', room_id), ('state', 'in', ('available', 'reserved'))]"
+                                options="{'no_create': True}"
+                                readonly="state in ('in_progress', 'discharged', 'cancelled')"/>
+                        </group>
+                        <group>
+                            <field name="expected_discharge_date"/>
+                            <field name="treatment_done_datetime"
+                                invisible="state not in ('treatment_done', 'discharged')"/>
+                            <field name="actual_discharge_datetime"
+                                invisible="state not in ('discharged',)"/>
+                            <field name="length_of_stay" invisible="state == 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Diagnoses" name="diagnoses">
+                            <field name="diagnosis_ids">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Treatments" name="treatments">
+                            <field name="treatment_ids"
+                                context="{
+                                    'default_patient_id': patient_id,
+                                    'default_physician_id': attending_physician_id,
+                                }">
+                                <list open_form_view="True">
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="physician_id"/>
+                                    <field name="diagnosis_id"/>
+                                    <field name="state" widget="badge"
+                                        decoration-info="state == 'draft'"
+                                        decoration-success="state == 'done'"
+                                        decoration-muted="state == 'cancel'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Nursing Sheets tab added in Phase 4 -->
+
+                        <page string="Lab Requests" name="lab_requests">
+                            <field name="lab_request_ids"
+                                context="{
+                                    'default_patient_id': patient_id,
+                                    'default_physician_id': attending_physician_id,
+                                }">
+                                <list open_form_view="True">
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="physician_id"/>
+                                    <field name="state" widget="badge"
+                                        decoration-info="state == 'draft'"
+                                        decoration-success="state == 'done'"
+                                        decoration-muted="state == 'cancel'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Prescriptions" name="prescriptions">
+                            <field name="prescription_ids"
+                                context="{
+                                    'default_patient_id': patient_id,
+                                    'default_physician_id': attending_physician_id,
+                                }">
+                                <list open_form_view="True">
+                                    <field name="name"/>
+                                    <field name="prescription_date"/>
+                                    <field name="physician_id"/>
+                                    <field name="state" widget="badge"
+                                        decoration-info="state == 'draft'"
+                                        decoration-success="state == 'prescription'"
+                                        decoration-muted="state == 'canceled'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Procedures (OT)" name="procedures">
+                            <field name="procedure_ids"
+                                context="{
+                                    'default_patient_id': patient_id,
+                                    'default_physician_id': attending_physician_id,
+                                }">
+                                <list open_form_view="True">
+                                    <field name="name"/>
+                                    <field name="product_id"/>
+                                    <field name="date"/>
+                                    <field name="physician_id"/>
+                                    <field name="state" widget="badge"
+                                        decoration-info="state == 'scheduled'"
+                                        decoration-success="state == 'done'"
+                                        decoration-muted="state == 'cancel'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Financial Summary" name="financials">
+                            <group>
+                                <group>
+                                    <field name="total_invoiced"/>
+                                    <field name="total_paid"/>
+                                </group>
+                                <group>
+                                    <field name="balance_due"/>
+                                </group>
+                            </group>
+                            <field name="invoice_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="invoice_date"/>
+                                    <field name="amount_total"/>
+                                    <field name="amount_residual"/>
+                                    <field name="payment_state" widget="badge"
+                                        decoration-success="payment_state == 'paid'"
+                                        decoration-warning="payment_state == 'partial'"
+                                        decoration-info="payment_state == 'not_paid'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         ADMISSION LIST VIEW
+    ============================================================ -->
+
+    <record id="view_admission_list" model="ir.ui.view">
+        <field name="name">hms.admission.list</field>
+        <field name="model">hms.admission</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state in ('cancelled', 'discharged')">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="admission_datetime"/>
+                <field name="admission_type"/>
+                <field name="ward_id"/>
+                <field name="bed_id"/>
+                <field name="attending_physician_id"/>
+                <field name="expected_discharge_date"/>
+                <field name="length_of_stay"/>
+                <field name="state" widget="badge"
+                    decoration-info="state == 'draft'"
+                    decoration-warning="state == 'confirmed'"
+                    decoration-success="state == 'in_progress'"
+                    decoration-muted="state in ('discharged', 'cancelled')"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         ADMISSION KANBAN VIEW
+    ============================================================ -->
+
+    <record id="view_admission_kanban" model="ir.ui.view">
+        <field name="name">hms.admission.kanban</field>
+        <field name="model">hms.admission</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="ward_id">
+                <field name="name"/>
+                <field name="state"/>
+                <field name="patient_id"/>
+                <field name="ward_id"/>
+                <field name="bed_id"/>
+                <field name="attending_physician_id"/>
+                <field name="admission_datetime"/>
+                <field name="length_of_stay"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content p-2">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <strong><field name="name"/></strong>
+                                    <span t-attf-class="badge rounded-pill
+                                        #{record.state.raw_value == 'in_progress' ? 'bg-success' :
+                                          record.state.raw_value == 'confirmed' ? 'bg-warning' :
+                                          record.state.raw_value == 'draft' ? 'bg-info' : 'bg-secondary'}">
+                                        <field name="state"/>
+                                    </span>
+                                </div>
+                                <div class="fw-bold">
+                                    <i class="fa fa-user"/> <field name="patient_id"/>
+                                </div>
+                                <div class="small mt-1">
+                                    <i class="fa fa-bed"/> <field name="bed_id"/>
+                                    <span t-if="record.ward_id.raw_value" class="ms-1 text-muted">
+                                        (<field name="ward_id"/>)
+                                    </span>
+                                </div>
+                                <div t-if="record.attending_physician_id.raw_value" class="small mt-1">
+                                    <i class="fa fa-user-md"/> <field name="attending_physician_id"/>
+                                </div>
+                                <div class="small mt-1 text-muted">
+                                    <i class="fa fa-clock-o"/> <field name="admission_datetime"/>
+                                    <span t-if="record.length_of_stay.raw_value" class="ms-2">
+                                        (<field name="length_of_stay"/> days)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         ADMISSION SEARCH VIEW
+    ============================================================ -->
+
+    <record id="view_admission_search" model="ir.ui.view">
+        <field name="name">hms.admission.search</field>
+        <field name="model">hms.admission</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="attending_physician_id"/>
+                <field name="ward_id"/>
+                <field name="bed_id"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="Currently Admitted" name="in_progress" domain="[('state','=','in_progress')]"/>
+                <filter string="Discharged" name="discharged" domain="[('state','=','discharged')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state','=','cancelled')]"/>
+                <separator/>
+                <filter string="Emergency Admissions" name="emergency"
+                    domain="[('admission_type','=','emergency')]"/>
+                <separator/>
+                <filter string="Today" name="today"
+                    domain="[('admission_datetime','&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <group>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Ward" name="group_ward" context="{'group_by': 'ward_id'}"/>
+                    <filter string="Admission Type" name="group_type" context="{'group_by': 'admission_type'}"/>
+                    <filter string="Physician" name="group_physician" context="{'group_by': 'attending_physician_id'}"/>
+                    <filter string="Admission Date" name="group_date" context="{'group_by': 'admission_datetime:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         ACTIONS
+    ============================================================ -->
+
+    <record id="action_admission" model="ir.actions.act_window">
+        <field name="name">All Admissions</field>
+        <field name="res_model">hms.admission</field>
+        <field name="view_mode">list,kanban,form</field>
+    </record>
+
+    <record id="action_admission_current" model="ir.actions.act_window">
+        <field name="name">Current Admissions</field>
+        <field name="res_model">hms.admission</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('state', '=', 'in_progress')]</field>
+        <field name="context">{'search_default_in_progress': 1}</field>
+    </record>
+
+    <record id="action_admission_pending_discharge" model="ir.actions.act_window">
+        <field name="name">Pending Discharge</field>
+        <field name="res_model">hms.admission</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state','=','in_progress'), ('expected_discharge_date','!=',False)]</field>
+    </record>
+
+</odoo>

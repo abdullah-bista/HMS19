@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- products -->
+        <record id="acs_hms_lab_service_0" model="product.product">
+            <field name="name">Hemogram</field>
+            <field name="type">service</field>
+            <field name="hospital_product_type">pathology</field>
+            <field name="list_price">100.0</field>
+            <field name="standard_price">100.0</field>
+        </record>
+
+        <record id="acs_hms_lab_service_1" model="product.product">
+            <field name="name">Complete Metabolic Panel</field>
+            <field name="type">service</field>
+            <field name="hospital_product_type">pathology</field>
+            <field name="list_price">150.0</field>
+            <field name="standard_price">150.0</field>
+        </record>
+
+        <record id="acs_hms_lab_service_2" model="product.product">
+            <field name="name">Lipid Profile</field>
+            <field name="type">service</field>
+            <field name="hospital_product_type">pathology</field>
+            <field name="list_price">120.0</field>
+            <field name="standard_price">120.0</field>
+        </record>
+
+        <record id="acs_hms_lab_service_3" model="product.product">
+            <field name="name">Thyroid Function Test</field>
+            <field name="type">service</field>
+            <field name="hospital_product_type">pathology</field>
+            <field name="list_price">130.0</field>
+            <field name="standard_price">130.0</field>
+        </record>
+
+
+        <!-- laboratory test -->
+        <record id="acs_lab_test_hemogram" model="acs.lab.test">
+            <field name="name">Hemogram</field>
+            <field name="code">HEMOGRAM</field>
+            <field name="description">A hemogram is a common blood test that provides important information about the types and numbers of cells in the blood, including red blood cells, white blood cells, and platelets.</field>
+            <field name="product_id" ref="acs_hms_lab_service_0"/>
+            <field name="sample_type_id" ref="acs_laboratory_sample_type_blood"/>
+            <field name="category_id" ref="lab_test_category_hematology"/>
+        </record>
+
+        <record id="acs_lab_test_cmp" model="acs.lab.test">
+            <field name="name">Complete Metabolic Panel</field>
+            <field name="code">CMP</field>
+            <field name="description">A comprehensive metabolic panel (CMP) is a set of 14 blood tests that gives your doctor important information about the current status of your metabolism, including the health of your kidneys and liver, electrolyte and acid/base balance, and levels of blood glucose and blood proteins.</field>
+            <field name="product_id" ref="acs_hms_lab_service_1"/>
+            <field name="sample_type_id" ref="acs_laboratory_sample_type_blood"/>
+            <field name="category_id" ref="lab_test_category_biochemistry"/>
+        </record>
+
+        <record id="acs_lab_test_lipid_profile" model="acs.lab.test">
+            <field name="name">Lipid Profile</field>
+            <field name="code">LIPID</field>
+            <field name="description">A lipid profile is a blood test that measures the amounts of cholesterol and fats called triglycerides in the blood. This test helps assess the risk of developing cardiovascular diseases.</field>
+            <field name="product_id" ref="acs_hms_lab_service_2"/>
+            <field name="sample_type_id" ref="acs_laboratory_sample_type_blood"/>
+            <field name="category_id" ref="lab_test_category_biochemistry"/>
+        </record>
+
+        <record id="acs_lab_test_thyroid" model="acs.lab.test">
+            <field name="name">Thyroid Function Test</field>
+            <field name="code">THYROID</field>
+            <field name="description">Thyroid function tests are blood tests used to check how well the thyroid gland is working. These tests can help diagnose thyroid diseases and conditions such as hyperthyroidism or hypothyroidism.</field>
+            <field name="product_id" ref="acs_hms_lab_service_3"/>
+            <field name="sample_type_id" ref="acs_laboratory_sample_type_blood"/>
+            <field name="category_id" ref="lab_test_category_biochemistry"/>
+        </record>
+
+
+
+        <record id="hemogram_lab_test_criteria_01" model="lab.test.critearea">
+            <field name="name">BLOOD COUNT</field>
+            <field name="display_type">line_section</field>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+        <record id="hemogram_lab_test_criteria_02" model="lab.test.critearea">
+            <field name="name">Hemoglobin</field>
+            <field name="normal_range_male">12-18</field>
+            <field name="normal_range_female">12-18</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_01"/>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+        <record id="hemogram_lab_test_criteria_03" model="lab.test.critearea">
+            <field name="name">Total WBC Count</field>
+            <field name="normal_range_male">4000-10000</field>
+            <field name="normal_range_female">4000-10000</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_03"/>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+        <record id="hemogram_lab_test_criteria_04" model="lab.test.critearea">
+            <field name="name">Polymorphs</field>
+            <field name="normal_range_male">60-70</field>
+            <field name="normal_range_female">60-70</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_00"/>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+        <record id="hemogram_lab_test_criteria_05" model="lab.test.critearea">
+            <field name="name">Lymphocytes</field>
+            <field name="normal_range_male">23-40</field>
+            <field name="normal_range_female">23-40</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_00"/>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+        <record id="hemogram_lab_test_criteria_06" model="lab.test.critearea">
+            <field name="name">Monocytes</field>
+            <field name="normal_range_male">01-04</field>
+            <field name="normal_range_female">01-04</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_00"/>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+        <record id="hemogram_lab_test_criteria_07" model="lab.test.critearea">
+            <field name="name">RCB Count</field>
+            <field name="normal_range_male">4.20-6.30</field>
+            <field name="normal_range_female">4.20-6.30</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_20"/>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+        <record id="hemogram_lab_test_criteria_08" model="lab.test.critearea">
+            <field name="name">Platelate Count</field>
+            <field name="normal_range_male">1.5-4.5</field>
+            <field name="normal_range_female">1.5-4.5</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_03"/>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+        <record id="hemogram_lab_test_criteria_09" model="lab.test.critearea">
+            <field name="name">BLOOD INDICES</field>
+            <field name="display_type">line_section</field>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+        <record id="hemogram_lab_test_criteria_10" model="lab.test.critearea">
+            <field name="name">HCT</field>
+            <field name="normal_range_male">37-51</field>
+            <field name="normal_range_female">37-51</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_00"/>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+        <record id="hemogram_lab_test_criteria_11" model="lab.test.critearea">
+            <field name="name">MVC</field>
+            <field name="normal_range_male">80-97</field>
+            <field name="normal_range_female">80-97</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_00"/>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+        <record id="hemogram_lab_test_criteria_12" model="lab.test.critearea">
+            <field name="name">MCHC</field>
+            <field name="normal_range_male">31-36</field>
+            <field name="normal_range_female">31-36</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_01"/>
+            <field name="test_id" ref="acs_lab_test_hemogram"/>
+        </record>
+
+
+        <record id="cmp_lab_test_criteria_01" model="lab.test.critearea">
+            <field name="name">Glucose</field>
+            <field name="normal_range_male">70-99</field>
+            <field name="normal_range_female">70-99</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_01"/>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+        <record id="cmp_lab_test_criteria_02" model="lab.test.critearea">
+            <field name="name">Calcium</field>
+            <field name="normal_range_male">8.5-10.2</field>
+            <field name="normal_range_female">8.5-10.2</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_02"/>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+        <record id="cmp_lab_test_criteria_03" model="lab.test.critearea">
+            <field name="name">Sodium</field>
+            <field name="normal_range_male">135-145</field>
+            <field name="normal_range_female">135-145</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_03"/>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+        <record id="cmp_lab_test_criteria_04" model="lab.test.critearea">
+            <field name="name">Potassium</field>
+            <field name="normal_range_male">3.5-5.0</field>
+            <field name="normal_range_female">3.5-5.0</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_04"/>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+        <record id="cmp_lab_test_criteria_05" model="lab.test.critearea">
+            <field name="name">Chloride</field>
+            <field name="normal_range_male">96-106</field>
+            <field name="normal_range_female">96-106</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_05"/>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+        <record id="cmp_lab_test_criteria_06" model="lab.test.critearea">
+            <field name="name">Carbon Dioxide</field>
+            <field name="normal_range_male">23-29</field>
+            <field name="normal_range_female">23-29</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_06"/>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+        <record id="cmp_lab_test_criteria_07" model="lab.test.critearea">
+            <field name="name">Albumin</field>
+            <field name="normal_range_male">3.5-5.0</field>
+            <field name="normal_range_female">3.5-5.0</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_07"/>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+        <record id="cmp_lab_test_criteria_08" model="lab.test.critearea">
+            <field name="name">Total Protein</field>
+            <field name="normal_range_male">6.0-8.3</field>
+            <field name="normal_range_female">6.0-8.3</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_08"/>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+        <record id="cmp_lab_test_criteria_09" model="lab.test.critearea">
+            <field name="name">Liver Function</field>
+            <field name="display_type">line_section</field>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+        <record id="cmp_lab_test_criteria_10" model="lab.test.critearea">
+            <field name="name">AST (SGOT)</field>
+            <field name="normal_range_male">10-40</field>
+            <field name="normal_range_female">10-40</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_09"/>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+        <record id="cmp_lab_test_criteria_11" model="lab.test.critearea">
+            <field name="name">ALT (SGPT)</field>
+            <field name="normal_range_male">7-56</field>
+            <field name="normal_range_female">7-56</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_10"/>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+        <record id="cmp_lab_test_criteria_12" model="lab.test.critearea">
+            <field name="name">Alkaline Phosphatase</field>
+            <field name="normal_range_male">44-147</field>
+            <field name="normal_range_female">44-147</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_11"/>
+            <field name="test_id" ref="acs_lab_test_cmp"/>
+        </record>
+
+
+
+        <record id="lipid_lab_test_criteria_01" model="lab.test.critearea">
+            <field name="name">Cholesterol</field>
+            <field name="normal_range_male">125-200</field>
+            <field name="normal_range_female">125-200</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_01"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+        <record id="lipid_lab_test_criteria_02" model="lab.test.critearea">
+            <field name="name">Triglycerides</field>
+            <field name="normal_range_male">40-150</field>
+            <field name="normal_range_female">40-150</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_02"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+        <record id="lipid_lab_test_criteria_03" model="lab.test.critearea">
+            <field name="name">LDL Cholesterol</field>
+            <field name="normal_range_male">60-130</field>
+            <field name="normal_range_female">60-130</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_03"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+        <record id="lipid_lab_test_criteria_04" model="lab.test.critearea">
+            <field name="name">HDL Cholesterol</field>
+            <field name="normal_range_male">40-60</field>
+            <field name="normal_range_female">50-60</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_04"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+        <record id="lipid_lab_test_criteria_05" model="lab.test.critearea">
+            <field name="name">VLDL Cholesterol</field>
+            <field name="normal_range_male">5-40</field>
+            <field name="normal_range_female">5-40</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_05"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+        <record id="lipid_lab_test_criteria_06" model="lab.test.critearea">
+            <field name="name">Total Cholesterol to HDL Ratio</field>
+            <field name="normal_range_male">3.5-5.0</field>
+            <field name="normal_range_female">3.5-5.0</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_06"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+        <record id="lipid_lab_test_criteria_07" model="lab.test.critearea">
+            <field name="name">Non-HDL Cholesterol</field>
+            <field name="normal_range_male">100-160</field>
+            <field name="normal_range_female">100-160</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_07"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+        <record id="lipid_lab_test_criteria_08" model="lab.test.critearea">
+            <field name="name">Apolipoprotein A1</field>
+            <field name="normal_range_male">120-160</field>
+            <field name="normal_range_female">120-160</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_08"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+        <record id="lipid_lab_test_criteria_09" model="lab.test.critearea">
+            <field name="name">Apolipoprotein B</field>
+            <field name="normal_range_male">70-130</field>
+            <field name="normal_range_female">70-130</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_09"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+        <record id="lipid_lab_test_criteria_10" model="lab.test.critearea">
+            <field name="name">Lipoprotein(a)</field>
+            <field name="normal_range_male">50</field>
+            <field name="normal_range_female">50</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_10"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+        <record id="lipid_lab_test_criteria_11" model="lab.test.critearea">
+            <field name="name">Total Cholesterol</field>
+            <field name="normal_range_male">200</field>
+            <field name="normal_range_female">200</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_11"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+        <record id="lipid_lab_test_criteria_12" model="lab.test.critearea">
+            <field name="name">Triglycerides to HDL Ratio</field>
+            <field name="normal_range_male">3.0</field>
+            <field name="normal_range_female">3.0</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_12"/>
+            <field name="test_id" ref="acs_lab_test_lipid_profile"/>
+        </record>
+
+
+
+        <record id="thyroid_lab_test_criteria_01" model="lab.test.critearea">
+            <field name="name">Thyroid Stimulating Hormone (TSH)</field>
+            <field name="normal_range_male">0.4-4.0</field>
+            <field name="normal_range_female">0.4-4.0</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_01"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+        <record id="thyroid_lab_test_criteria_02" model="lab.test.critearea">
+            <field name="name">Free T4 (Thyroxine)</field>
+            <field name="normal_range_male">0.8-1.8</field>
+            <field name="normal_range_female">0.8-1.8</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_02"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+        <record id="thyroid_lab_test_criteria_03" model="lab.test.critearea">
+            <field name="name">Free T3 (Triiodothyronine)</field>
+            <field name="normal_range_male">2.3-4.2</field>
+            <field name="normal_range_female">2.3-4.2</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_03"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+        <record id="thyroid_lab_test_criteria_04" model="lab.test.critearea">
+            <field name="name">Total T4</field>
+            <field name="normal_range_male">5.0-12.0</field>
+            <field name="normal_range_female">5.0-12.0</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_04"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+        <record id="thyroid_lab_test_criteria_05" model="lab.test.critearea">
+            <field name="name">Total T3</field>
+            <field name="normal_range_male">80-200</field>
+            <field name="normal_range_female">80-200</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_05"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+        <record id="thyroid_lab_test_criteria_06" model="lab.test.critearea">
+            <field name="name">Thyroglobulin</field>
+            <field name="normal_range_male">55</field>
+            <field name="normal_range_female">55</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_06"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+        <record id="thyroid_lab_test_criteria_07" model="lab.test.critearea">
+            <field name="name">Thyroid Peroxidase Antibodies (TPOAb)</field>
+            <field name="normal_range_male">35</field>
+            <field name="normal_range_female">35</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_07"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+        <record id="thyroid_lab_test_criteria_08" model="lab.test.critearea">
+            <field name="name">Thyroid Binding Globulin (TBG)</field>
+            <field name="normal_range_male">10-30</field>
+            <field name="normal_range_female">10-30</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_08"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+        <record id="thyroid_lab_test_criteria_09" model="lab.test.critearea">
+            <field name="name">Reverse T3 (rT3)</field>
+            <field name="normal_range_male">0.1-0.3</field>
+            <field name="normal_range_female">0.1-0.3</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_09"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+        <record id="thyroid_lab_test_criteria_10" model="lab.test.critearea">
+            <field name="name">Thyroid Stimulating Immunoglobulin (TSI)</field>
+            <field name="normal_range_male">140</field>
+            <field name="normal_range_female">140</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_10"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+        <record id="thyroid_lab_test_criteria_11" model="lab.test.critearea">
+            <field name="name">T3 Uptake</field>
+            <field name="normal_range_male">24-39</field>
+            <field name="normal_range_female">24-39</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_11"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+        <record id="thyroid_lab_test_criteria_12" model="lab.test.critearea">
+            <field name="name">Thyroid Function Index (TFI)</field>
+            <field name="normal_range_male">85-105</field>
+            <field name="normal_range_female">85-105</field>
+            <field name="lab_uom_id" ref="acs_lab_uom_12"/>
+            <field name="test_id" ref="acs_lab_test_thyroid"/>
+        </record>
+
+    </data>
+</odoo>
