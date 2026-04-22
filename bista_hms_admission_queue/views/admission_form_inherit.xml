@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_admission_form_inherit_queue" model="ir.ui.view">
+        <field name="name">hms.admission.form.inherit.queue</field>
+        <field name="model">hms.admission</field>
+        <field name="inherit_id" ref="bista_hms_emergency.view_admission_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Smart button: Queue Token -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <div class="oe_stat_button"
+                     invisible="not admission_queue_token"
+                     title="Admission Queue Token">
+                    <i class="fa fa-ticket o_button_icon"/>
+                    <div class="o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="admission_queue_token"/>
+                        </span>
+                        <span class="o_stat_text">Queue Token</span>
+                    </div>
+                </div>
+            </xpath>
+
+            <!-- Header button: Admit from Queue -->
+            <xpath expr="//header" position="inside">
+                <button name="action_call_this_admission"
+                        string="Admit from Queue"
+                        type="object"
+                        invisible="state != 'confirmed'"
+                        class="btn-primary"
+                        groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Under IPD → Admissions (between Current Admissions=20 and Pending Discharge=30) -->
+    <menuitem id="menu_bista_admission_queue_under_ipd"
+              name="Admission Queue"
+              parent="bista_hms_emergency.menu_bista_ipd_admissions"
+              action="bista_hms_admission_queue.action_bista_admission_queue"
+              sequence="25"
+              groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+
+    <!-- Under Patient Queue root (alongside Waiting Queue) -->
+    <menuitem id="menu_bista_admission_queue_under_root"
+              name="Admission Queue"
+              parent="bista_hms_queue.menu_bista_queue_root"
+              action="bista_hms_admission_queue.action_bista_admission_queue"
+              sequence="15"
+              groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+
+    <!-- Configuration: Admission Queue Counters (manager only) -->
+    <menuitem id="menu_bista_admission_queue_counters"
+              name="Admission Queue Counters"
+              parent="bista_hms_emergency.menu_bista_configuration"
+              action="bista_hms_admission_queue.action_bista_admission_queue_counter"
+              sequence="55"
+              groups="acs_hms_base.group_hms_manager"/>
+
+</odoo>

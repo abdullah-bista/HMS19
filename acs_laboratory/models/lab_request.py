@@ -226,7 +226,7 @@ class LaboratoryRequest(models.Model):
     def button_accept(self):
         if not self.invoice_id:
             raise ValidationError("Invoice is not created yet. Please create invoice before accepting the request.")
-        if self.invoice_id.payment_state in ['paid', 'in_payment']:
+        if self.invoice_id.payment_state not in ['paid', 'in_payment']:
             raise ValidationError("Invoice is not paid yet. Please pay the invoice before accepting the request.")
 
         company_id = self.sudo().company_id

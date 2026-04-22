@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         List View
+    ============================================================ -->
+    <record id="view_bista_upcoming_queue_list" model="ir.ui.view">
+        <field name="name">bista.upcoming.patient.queue.list</field>
+        <field name="model">bista.upcoming.patient.queue</field>
+        <field name="arch" type="xml">
+            <list string="Upcoming Patient Queue"
+                  default_order="queue_priority asc, registration_datetime asc"
+                  decoration-danger="urgency == 'medical_emergency'"
+                  decoration-warning="urgency == 'urgent'"
+                  delete="false">
+                <field name="name" string="Reference"/>
+                <field name="patient_id"/>
+                <field name="contact_channel" widget="badge"
+                       options="{'classes': {
+                           'walk_in': 'info',
+                           'phone': 'secondary',
+                           'online': 'primary',
+                           'referral': 'warning',
+                           'insurance': 'success',
+                           'emergency_referral': 'danger'
+                       }}"/>
+                <field name="queue_type" widget="badge"
+                       options="{'classes': {
+                           'consultation': 'info',
+                           'admission': 'primary'
+                       }}"/>
+                <field name="department_id" optional="show"/>
+                <field name="ward_id" optional="show"/>
+                <field name="preferred_physician_id" optional="show"/>
+                <field name="urgency" widget="badge"
+                       options="{'classes': {
+                           'medical_emergency': 'danger',
+                           'urgent': 'warning',
+                           'normal': 'success'
+                       }}"/>
+                <field name="registration_datetime" string="Registered At"/>
+                <field name="state" widget="badge"
+                       options="{'classes': {
+                           'pending': 'secondary',
+                           'contacted': 'info',
+                           'processed': 'success',
+                           'cancelled': 'danger'
+                       }}"/>
+                <!-- Hidden fields needed for invisible conditions on buttons -->
+                <field name="queue_priority" column_invisible="1"/>
+                <!-- Action buttons -->
+                <button name="action_contact"
+                        type="object"
+                        string="Mark Contacted"
+                        icon="fa-phone"
+                        class="btn-primary btn-sm"
+                        invisible="state != 'pending'"
+                        groups="acs_hms.group_hms_receptionist"/>
+                <button name="action_create_appointment"
+                        type="object"
+                        string="Create Appointment"
+                        icon="fa-stethoscope"
+                        class="btn-success btn-sm"
+                        invisible="state != 'contacted' or queue_type != 'consultation'"
+                        groups="acs_hms.group_hms_receptionist"/>
+                <button name="action_create_admission"
+                        type="object"
+                        string="Create Admission"
+                        icon="fa-bed"
+                        class="btn-success btn-sm"
+                        invisible="state != 'contacted' or queue_type != 'admission'"
+                        groups="acs_hms.group_hms_receptionist"/>
+                <button name="action_cancel"
+                        type="object"
+                        string="Cancel"
+                        icon="fa-times"
+                        class="btn-danger btn-sm"
+                        invisible="state in ('processed', 'cancelled')"
+                        groups="acs_hms.group_hms_receptionist,acs_hms_base.group_hms_manager"
+                        confirm="Cancel this queue entry?"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         Kanban View
+    ============================================================ -->
+    <record id="view_bista_upcoming_queue_kanban" model="ir.ui.view">
+        <field name="name">bista.upcoming.patient.queue.kanban</field>
+        <field name="model">bista.upcoming.patient.queue</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="queue_type"
+                    default_order="queue_priority asc, registration_datetime asc"
+                    class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="urgency"/>
+                <field name="queue_type"/>
+                <field name="contact_channel"/>
+                <field name="department_id"/>
+                <field name="ward_id"/>
+                <field name="preferred_physician_id"/>
+                <field name="registration_datetime"/>
+                <field name="state"/>
+                <field name="queue_priority"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="text-center p-2 mb-2 rounded fw-bold
+                            #{record.urgency.raw_value == 'medical_emergency' ? 'bg-danger text-white' :
+                              record.urgency.raw_value == 'urgent'            ? 'bg-warning'           :
+                                                                                'bg-success text-white'}">
+                            <field name="name"/>
+                        </div>
+                        <div class="p-2">
+                            <div class="fw-bold mb-1">
+                                <field name="patient_id"/>
+                            </div>
+                            <div class="mb-1">
+                                <field name="urgency" widget="badge"
+                                       options="{'classes': {
+                                           'medical_emergency': 'danger',
+                                           'urgent': 'warning',
+                                           'normal': 'success'
+                                       }}"/>
+                            </div>
+                            <div class="mb-1">
+                                <field name="contact_channel" widget="badge"/>
+                            </div>
+                            <div class="text-muted small mb-1">
+                                <i class="fa fa-clock-o me-1"/>
+                                <field name="registration_datetime"/>
+                            </div>
+                            <t t-if="record.department_id.raw_value">
+                                <div class="text-muted small">
+                                    <i class="fa fa-hospital-o me-1"/>
+                                    <field name="department_id"/>
+                                </div>
+                            </t>
+                            <t t-if="record.ward_id.raw_value">
+                                <div class="text-muted small">
+                                    <i class="fa fa-bed me-1"/>
+                                    <field name="ward_id"/>
+                                </div>
+                            </t>
+                            <t t-if="record.preferred_physician_id.raw_value">
+                                <div class="text-muted small">
+                                    <i class="fa fa-user-md me-1"/>
+                                    <field name="preferred_physician_id"/>
+                                </div>
+                            </t>
+                        </div>
+                        <div class="o_kanban_footer mt-2">
+                            <button name="action_contact"
+                                    type="object"
+                                    string="Mark Contacted"
+                                    class="btn btn-primary btn-sm w-100 mb-1"
+                                    groups="acs_hms.group_hms_receptionist"
+                                    t-if="record.state.raw_value == 'pending'"/>
+                            <button name="action_create_appointment"
+                                    type="object"
+                                    string="Create Appointment"
+                                    class="btn btn-success btn-sm w-100 mb-1"
+                                    groups="acs_hms.group_hms_receptionist"
+                                    t-if="record.state.raw_value == 'contacted' and record.queue_type.raw_value == 'consultation'"/>
+                            <button name="action_create_admission"
+                                    type="object"
+                                    string="Create Admission"
+                                    class="btn btn-success btn-sm w-100"
+                                    groups="acs_hms.group_hms_receptionist"
+                                    t-if="record.state.raw_value == 'contacted' and record.queue_type.raw_value == 'admission'"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         Form View
+    ============================================================ -->
+    <record id="view_bista_upcoming_queue_form" model="ir.ui.view">
+        <field name="name">bista.upcoming.patient.queue.form</field>
+        <field name="model">bista.upcoming.patient.queue</field>
+        <field name="arch" type="xml">
+            <form string="Upcoming Patient Queue">
+                <header>
+                    <button name="action_contact"
+                            string="Mark Contacted"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'pending'"
+                            groups="acs_hms.group_hms_receptionist"/>
+                    <button name="action_create_appointment"
+                            string="Create Appointment"
+                            type="object"
+                            class="btn-success"
+                            invisible="state != 'contacted' or queue_type != 'consultation'"
+                            groups="acs_hms.group_hms_receptionist"/>
+                    <button name="action_create_admission"
+                            string="Create Admission"
+                            type="object"
+                            class="btn-success"
+                            invisible="state != 'contacted' or queue_type != 'admission'"
+                            groups="acs_hms.group_hms_receptionist"/>
+                    <button name="action_reset_to_pending"
+                            string="Reset to Pending"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state != 'contacted'"
+                            groups="acs_hms_base.group_hms_manager"/>
+                    <button name="action_cancel"
+                            string="Cancel"
+                            type="object"
+                            class="btn-danger"
+                            invisible="state in ('processed', 'cancelled')"
+                            groups="acs_hms.group_hms_receptionist,acs_hms_base.group_hms_manager"
+                            confirm="Are you sure you want to cancel this queue entry?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending,contacted,processed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Patient Information">
+                            <field name="patient_id"
+                                   readonly="state == 'processed'"/>
+                            <field name="contact_channel"
+                                   readonly="state == 'processed'"/>
+                            <field name="referral_source_id"
+                                   invisible="contact_channel != 'referral'"
+                                   readonly="state == 'processed'"/>
+                        </group>
+                        <group string="Queue Details">
+                            <field name="queue_type"
+                                   readonly="state == 'processed'"/>
+                            <field name="urgency"
+                                   readonly="state == 'processed'"/>
+                            <field name="registration_datetime"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Routing"
+                               invisible="queue_type != 'consultation'">
+                            <field name="department_id"
+                                   readonly="state == 'processed'"/>
+                            <field name="preferred_physician_id"
+                                   readonly="state == 'processed'"/>
+                        </group>
+                        <group string="Routing"
+                               invisible="queue_type != 'admission'">
+                            <field name="ward_id"
+                                   readonly="state == 'processed'"/>
+                            <field name="preferred_physician_id"
+                                   readonly="state == 'processed'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="chief_complaint"
+                               placeholder="Describe the patient's main complaint..."
+                               readonly="state == 'processed'"/>
+                    </group>
+                    <group>
+                        <field name="notes"
+                               placeholder="Staff notes..."/>
+                    </group>
+                    <group string="Created Record" invisible="state != 'processed'">
+                        <field name="appointment_id"
+                               invisible="not appointment_id"
+                               readonly="1"/>
+                        <field name="admission_id"
+                               invisible="not admission_id"
+                               readonly="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         Search View
+    ============================================================ -->
+    <record id="view_bista_upcoming_queue_search" model="ir.ui.view">
+        <field name="name">bista.upcoming.patient.queue.search</field>
+        <field name="model">bista.upcoming.patient.queue</field>
+        <field name="arch" type="xml">
+            <search string="Upcoming Patient Queue">
+                <field name="name" string="Reference"/>
+                <field name="patient_id"/>
+                <field name="department_id"/>
+                <field name="ward_id"/>
+                <field name="preferred_physician_id"/>
+                <separator/>
+                <filter name="filter_pending"
+                        string="Pending"
+                        domain="[('state', '=', 'pending')]"/>
+                <filter name="filter_contacted"
+                        string="Contacted"
+                        domain="[('state', '=', 'contacted')]"/>
+                <filter name="filter_active"
+                        string="Active"
+                        domain="[('state', 'in', ['pending', 'contacted'])]"/>
+                <filter name="filter_processed"
+                        string="Processed"
+                        domain="[('state', '=', 'processed')]"/>
+                <filter name="filter_cancelled"
+                        string="Cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter name="filter_consultation"
+                        string="OPD Consultation"
+                        domain="[('queue_type', '=', 'consultation')]"/>
+                <filter name="filter_admission"
+                        string="IPD Admission"
+                        domain="[('queue_type', '=', 'admission')]"/>
+                <separator/>
+                <filter name="filter_emergency"
+                        string="Medical Emergency"
+                        domain="[('urgency', '=', 'medical_emergency')]"/>
+                <filter name="filter_urgent"
+                        string="Urgent"
+                        domain="[('urgency', '=', 'urgent')]"/>
+                <filter name="filter_normal"
+                        string="Normal"
+                        domain="[('urgency', '=', 'normal')]"/>
+                <separator/>
+                <filter name="filter_walk_in"
+                        string="Walk-In"
+                        domain="[('contact_channel', '=', 'walk_in')]"/>
+                <filter name="filter_phone"
+                        string="Phone"
+                        domain="[('contact_channel', '=', 'phone')]"/>
+                <filter name="filter_referral"
+                        string="Referral"
+                        domain="[('contact_channel', '=', 'referral')]"/>
+                <filter name="filter_online"
+                        string="Online"
+                        domain="[('contact_channel', '=', 'online')]"/>
+                <filter name="filter_emergency_referral"
+                        string="Emergency Referral"
+                        domain="[('contact_channel', '=', 'emergency_referral')]"/>
+                <group>
+                    <filter name="grp_queue_type"
+                            string="Queue Type"
+                            context="{'group_by': 'queue_type'}"/>
+                    <filter name="grp_department"
+                            string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="grp_ward"
+                            string="Ward"
+                            context="{'group_by': 'ward_id'}"/>
+                    <filter name="grp_urgency"
+                            string="Urgency"
+                            context="{'group_by': 'urgency'}"/>
+                    <filter name="grp_state"
+                            string="State"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="grp_channel"
+                            string="Contact Channel"
+                            context="{'group_by': 'contact_channel'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         Window Action — Active Queue (pending + contacted)
+    ============================================================ -->
+    <record id="action_bista_upcoming_queue" model="ir.actions.act_window">
+        <field name="name">Upcoming Patient Queue</field>
+        <field name="res_model">bista.upcoming.patient.queue</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('state', 'in', ['pending', 'contacted'])]</field>
+        <field name="search_view_id" ref="view_bista_upcoming_queue_search"/>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'list',   'view_id': ref('view_bista_upcoming_queue_list')}),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_bista_upcoming_queue_kanban')}),
+            (0, 0, {'view_mode': 'form',   'view_id': ref('view_bista_upcoming_queue_form')}),
+        ]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No patients in the upcoming queue</p>
+            <p>Register a new patient request using the <strong>New</strong> button.</p>
+        </field>
+    </record>
+
+    <!-- Window Action — All Records (manager / history) -->
+    <record id="action_bista_upcoming_queue_all" model="ir.actions.act_window">
+        <field name="name">All Upcoming Queue Records</field>
+        <field name="res_model">bista.upcoming.patient.queue</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_bista_upcoming_queue_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_bista_upcoming_queue_form')}),
+        ]"/>
+    </record>
+
+</odoo>

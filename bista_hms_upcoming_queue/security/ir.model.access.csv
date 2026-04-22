@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bista_upcoming_queue_user,bista.upcoming.patient.queue user,model_bista_upcoming_patient_queue,acs_hms_base.group_hms_user,1,0,0,0
+access_bista_upcoming_queue_receptionist,bista.upcoming.patient.queue receptionist,model_bista_upcoming_patient_queue,acs_hms.group_hms_receptionist,1,1,1,0
+access_bista_upcoming_queue_nurse,bista.upcoming.patient.queue nurse,model_bista_upcoming_patient_queue,acs_hms.group_hms_nurse,1,0,0,0
+access_bista_upcoming_queue_manager,bista.upcoming.patient.queue manager,model_bista_upcoming_patient_queue,acs_hms_base.group_hms_manager,1,1,1,1

@@ -11,18 +11,8 @@
         <field name="inherit_id" ref="acs_hms.view_hms_appointment_form"/>
         <field name="arch" type="xml">
 
-            <!-- Invoice smart button in button_box -->
+            <!-- Smart buttons in button_box -->
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="view_invoice" type="object"
-                        class="oe_stat_button" icon="fa-file-text-o"
-                        invisible="not invoice_id">
-                    <div class="o_stat_info">
-                        <span class="o_stat_value">
-                            <field name="invoice_count"/>
-                        </span>
-                        <span class="o_stat_text">Invoice</span>
-                    </div>
-                </button>
                 <button name="action_view_lab_requests" type="object"
                         class="oe_stat_button" icon="fa-flask"
                         groups="acs_laboratory.group_hms_lab_user">
@@ -31,6 +21,14 @@
                             <field name="lab_request_count"/>
                         </span>
                         <span class="o_stat_text">Lab Requests</span>
+                    </div>
+                </button>
+                <button name="action_view_admission" type="object"
+                        class="oe_stat_button" icon="fa-hospital-o"
+                        invisible="not admission_id">
+                    <div class="o_stat_info">
+                        <field name="admission_count" class="o_stat_value"/>
+                        <span class="o_stat_text">IPD Admission</span>
                     </div>
                 </button>
             </xpath>
@@ -48,6 +46,11 @@
                         invisible="state not in ('in_consultation')"
                         class="btn-secondary"
                         groups="acs_laboratory.group_hms_lab_user"/>
+                <button name="action_admit_to_ipd"
+                        string="Admit To IPD"
+                        type="object"
+                        invisible="state != 'in_consultation' or has_ongoing_admission"
+                        class="btn-success"/>
             </xpath>
 
         </field>

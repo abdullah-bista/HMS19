@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_hms_ward_form_inherit_admission_queue" model="ir.ui.view">
+        <field name="name">hms.ward.form.inherit.admission.queue</field>
+        <field name="model">hms.ward</field>
+        <field name="inherit_id" ref="bista_hms_emergency.view_ward_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='code']" position="after">
+                <field name="admission_queue_prefix"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

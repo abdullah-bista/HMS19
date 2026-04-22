@@ -20,11 +20,26 @@ class Appointment(models.Model):
     lab_request_count = fields.Integer(
         compute='_compute_lab_request_count', string='# Lab Requests'
     )
+    admission_count = fields.Integer(
+        compute='_compute_admission_count', string='# Admissions'
+    )
+    has_ongoing_admission = fields.Boolean(
+        compute='_compute_admission_count',
+        help="True when the linked admission is active (not discharged/cancelled)."
+    )
 
     @api.depends('lab_request_ids')
     def _compute_lab_request_count(self):
         for rec in self:
             rec.lab_request_count = len(rec.lab_request_ids)
+
+    @api.depends('admission_id', 'admission_id.state')
+    def _compute_admission_count(self):
+        for rec in self:
+            rec.admission_count = 1 if rec.admission_id else 0
+            rec.has_ongoing_admission = bool(
+                rec.admission_id and rec.admission_id.state not in ('discharged', 'cancelled')
+            )
 
     def action_view_lab_requests(self):
         """Open all lab requests linked to this appointment."""
@@ -93,3 +108,44 @@ class Appointment(models.Model):
         if not self.invoice_id:
             raise ValidationError('Please create invoice first before send the patient into Waiting.')
         return super(Appointment, self).appointment_waiting()
+
+    def action_admit_to_ipd(self):
+        """Open IPD Admission form pre-filled from this appointment (doctor consultation flow)."""
+        self.ensure_one()
+        if self.state != 'in_consultation':
+            raise UserError(_('Admission can only be initiated during an active consultation.'))
+        if self.admission_id:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('IPD Admission'),
+                'res_model': 'hms.admission',
+                'view_mode': 'form',
+                'res_id': self.admission_id.id,
+                'target': 'current',
+            }
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Create IPD Admission'),
+            'res_model': 'hms.admission',
+            'view_mode': 'form',
+            'context': {
+                'default_patient_id': self.patient_id.id,
+                'default_appointment_id': self.id,
+                'default_admission_type': 'appointment',
+                'default_attending_physician_id': self.physician_id.id if self.physician_id else False,
+                'default_admission_reason': self.chief_complain or '',
+            },
+            'target': 'current',
+        }
+
+    def action_view_admission(self):
+        """Open the linked IPD admission from the smart button."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('IPD Admission'),
+            'res_model': 'hms.admission',
+            'view_mode': 'form',
+            'res_id': self.admission_id.id,
+            'target': 'current',
+        }

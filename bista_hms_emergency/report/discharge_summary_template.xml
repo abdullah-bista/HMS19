@@ -21,19 +21,19 @@
                                 <table class="table table-sm table-bordered">
                                     <tr>
                                         <th style="width:40%">Patient</th>
-                                        <td><t t-field="o.patient_id"/></td>
+                                        <td><t t-esc="o.patient_id.name"/></td>
                                     </tr>
                                     <tr>
                                         <th>Date of Birth</th>
-                                        <td><t t-field="o.patient_id.birthday"/></td>
+                                        <td><t t-esc="o.patient_id.birthday"/></td>
                                     </tr>
                                     <tr>
                                         <th>Gender</th>
-                                        <td><t t-field="o.patient_id.gender"/></td>
+                                        <td><t t-esc="o.patient_id.gender"/></td>
                                     </tr>
                                     <tr>
                                         <th>Discharge Type</th>
-                                        <td><t t-field="o.discharge_type"/></td>
+                                        <td><t t-esc="o.discharge_type"/></td>
                                     </tr>
                                 </table>
                             </div>
@@ -41,38 +41,38 @@
                                 <table class="table table-sm table-bordered">
                                     <tr>
                                         <th style="width:40%">Discharge Date</th>
-                                        <td><t t-field="o.discharge_datetime" t-options='{"format": "dd/MM/yyyy HH:mm"}'/></td>
+                                        <td><t t-esc="o.discharge_datetime"/></td>
                                     </tr>
                                     <tr>
                                         <th>Discharging Physician</th>
-                                        <td><t t-field="o.physician_id"/></td>
+                                        <td><t t-esc="o.physician_id.name"/></td>
                                     </tr>
                                     <tr>
                                         <th>Discharge Condition</th>
-                                        <td><t t-field="o.discharge_condition"/></td>
+                                        <td><t t-esc="o.discharge_condition"/></td>
                                     </tr>
                                     <t t-if="o.discharge_type == 'ipd' and o.admission_id">
                                         <tr>
                                             <th>Admission No.</th>
-                                            <td><t t-field="o.admission_id.name"/></td>
+                                            <td><t t-esc="o.admission_id.name"/></td>
                                         </tr>
                                         <tr>
                                             <th>Admission Date</th>
-                                            <td><t t-field="o.admission_id.admission_datetime" t-options='{"format": "dd/MM/yyyy HH:mm"}'/></td>
+                                            <td><t t-esc="o.admission_id.admission_datetime"/></td>
                                         </tr>
                                         <tr>
                                             <th>Length of Stay</th>
-                                            <td><t t-field="o.admission_id.length_of_stay"/> days</td>
+                                            <td><t t-esc="o.admission_id.length_of_stay"/> days</td>
                                         </tr>
                                     </t>
                                     <t t-if="o.discharge_type == 'emergency' and o.emergency_case_id">
                                         <tr>
                                             <th>ER Case No.</th>
-                                            <td><t t-field="o.emergency_case_id.name"/></td>
+                                            <td><t t-esc="o.emergency_case_id.name"/></td>
                                         </tr>
                                         <tr>
                                             <th>Arrival Date</th>
-                                            <td><t t-field="o.emergency_case_id.arrival_datetime" t-options='{"format": "dd/MM/yyyy HH:mm"}'/></td>
+                                            <td><t t-esc="o.emergency_case_id.arrival_datetime"/></td>
                                         </tr>
                                     </t>
                                 </table>
@@ -86,15 +86,15 @@
                             </div>
                             <div class="col-6" t-if="o.admission_diagnosis">
                                 <strong>Diagnosis at Admission:</strong>
-                                <p><t t-field="o.admission_diagnosis"/></p>
+                                <p><t t-esc="o.admission_diagnosis"/></p>
                             </div>
                             <div class="col-6" t-if="o.discharge_diagnosis">
                                 <strong>Final Discharge Diagnosis:</strong>
-                                <p><t t-field="o.discharge_diagnosis"/></p>
+                                <p><t t-esc="o.discharge_diagnosis"/></p>
                             </div>
                             <div class="col-12" t-if="o.diagnosis_ids">
                                 <strong>Final Diagnoses:</strong>
-                                <p><t t-foreach="o.diagnosis_ids" t-as="d"><t t-field="d.name"/><t t-if="not d_last">, </t></t></p>
+                                <p><t t-foreach="o.diagnosis_ids" t-as="d"><t t-esc="d.name"/><t t-if="not d_last">, </t></t></p>
                             </div>
                         </div>
 
@@ -135,14 +135,14 @@
                             </div>
                             <div class="col-6" t-if="o.follow_up_date">
                                 <strong>Follow-up Date:</strong>
-                                <p><t t-field="o.follow_up_date" t-options='{"format": "dd/MM/yyyy"}'/></p>
+                                <p><t t-esc="o.follow_up_date"/></p>
                             </div>
                             <div class="col-6" t-if="o.follow_up_physician_id">
                                 <strong>Follow-up Physician:</strong>
-                                <p><t t-field="o.follow_up_physician_id"/></p>
+                                <p><t t-esc="o.follow_up_physician_id"/></p>
                             </div>
                             <div class="col-12" t-if="o.follow_up_instructions">
-                                <div t-field="o.follow_up_instructions"/>
+                                <div t-esc="o.follow_up_instructions"/>
                             </div>
                         </div>
 
@@ -153,15 +153,15 @@
                             </div>
                             <div class="col-4" t-if="o.diet_instructions">
                                 <strong>Diet:</strong>
-                                <p><t t-field="o.diet_instructions"/></p>
+                                <p><t t-esc="o.diet_instructions"/></p>
                             </div>
                             <div class="col-4" t-if="o.activity_restrictions">
                                 <strong>Activity:</strong>
-                                <p><t t-field="o.activity_restrictions"/></p>
+                                <p><t t-esc="o.activity_restrictions"/></p>
                             </div>
                             <div class="col-4" t-if="o.warning_signs">
                                 <strong>Warning Signs:</strong>
-                                <p><t t-field="o.warning_signs"/></p>
+                                <p><t t-esc="o.warning_signs"/></p>
                             </div>
                         </div>
 
@@ -170,13 +170,13 @@
                             <div class="col-6 text-center">
                                 <div class="border-top pt-2">
                                     <strong>Discharging Physician</strong><br/>
-                                    <t t-field="o.physician_id"/>
+                                    <t t-esc="o.physician_id.name"/>
                                 </div>
                             </div>
                             <div class="col-6 text-center">
                                 <div class="border-top pt-2">
                                     <strong>Approved By</strong><br/>
-                                    <t t-field="o.approved_by"/>
+                                    <t t-esc="o.approved_by.name"/>
                                 </div>
                             </div>
                         </div>

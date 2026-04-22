@@ -5,6 +5,10 @@
          TOP LEVEL MENUS
     ============================================================ -->
 
+    <menuitem id="menu_bista_reception_root"
+              name="Reception"
+              sequence="59"/>
+
     <menuitem id="menu_bista_emergency_root"
               name="Emergency"
               sequence="60"/>
@@ -19,13 +23,13 @@
 
     <menuitem id="menu_bista_reception"
               name="Reception / Check-In"
-              parent="menu_bista_emergency_root"
+              parent="menu_bista_reception_root"
               action="bista_hms_emergency.action_reception"
               sequence="5"/>
 
     <menuitem id="menu_bista_reception_pending"
               name="Pending Check-Ins"
-              parent="menu_bista_emergency_root"
+              parent="menu_bista_reception_root"
               action="bista_hms_emergency.action_reception_pending"
               sequence="6"/>
 

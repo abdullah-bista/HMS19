@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         Patient Queue — List View (standalone, not inheriting base list)
+    ============================================================ -->
+    <record id="view_bista_queue_list" model="ir.ui.view">
+        <field name="name">bista.queue.appointment.list</field>
+        <field name="model">hms.appointment</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <list string="Patient Queue"
+                  decoration-danger="urgency == 'medical_emergency'"
+                  decoration-warning="urgency == 'urgent'"
+                  create="false"
+                  delete="false"
+                  default_order="bista_queue_priority asc, waiting_date_start asc">
+                <field name="bista_queue_token" string="Token" optional="show"/>
+                <field name="patient_id"/>
+                <field name="urgency" widget="badge"
+                       options="{'classes': {'medical_emergency': 'danger', 'urgent': 'warning', 'normal': 'success'}}"/>
+                <field name="waiting_date_start" string="Waiting Since"/>
+                <field name="waiting_duration_timer" string="Wait Time"
+                       widget="AcsTimer"
+                       options="{'widget_start_field': 'waiting_date_start', 'widget_stop_field': 'waiting_date_end', 'duration_field': 'waiting_duration_timer'}"/>
+                <field name="department_id" optional="show"/>
+                <field name="physician_id" optional="show"/>
+                <button name="action_call_this_patient"
+                        type="object"
+                        string="Call Patient"
+                        class="btn-primary btn-sm"
+                        groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+                <field name="bista_queue_priority" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         Patient Queue — Kanban View
+    ============================================================ -->
+    <record id="view_bista_queue_kanban" model="ir.ui.view">
+        <field name="name">bista.queue.appointment.kanban</field>
+        <field name="model">hms.appointment</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <kanban default_order="bista_queue_priority asc, waiting_date_start asc"
+                    create="false"
+                    class="o_kanban_small_column">
+                <field name="bista_queue_token"/>
+                <field name="patient_id"/>
+                <field name="urgency"/>
+                <field name="waiting_date_start"/>
+                <field name="department_id"/>
+                <field name="physician_id"/>
+                <field name="bista_queue_priority"/>
+                <templates>
+                    <t t-name="card">
+                        <!-- Token header — color depends on urgency -->
+                        <div t-attf-class="text-center p-2 mb-2 rounded fw-bold fs-4
+                            #{ record.urgency.raw_value == 'medical_emergency' ? 'bg-danger text-white' :
+                               record.urgency.raw_value == 'urgent' ? 'bg-warning' : 'bg-success text-white' }">
+                            <t t-if="record.bista_queue_token.raw_value">
+                                <field name="bista_queue_token"/>
+                            </t>
+                            <t t-else="">—</t>
+                        </div>
+
+                        <div class="p-2">
+                            <div class="fw-bold mb-1">
+                                <field name="patient_id"/>
+                            </div>
+                            <div class="mb-1">
+                                <field name="urgency" widget="badge"
+                                       options="{'classes': {'medical_emergency': 'danger', 'urgent': 'warning', 'normal': 'success'}}"/>
+                            </div>
+                            <div class="text-muted small mb-1">
+                                Waiting since: <field name="waiting_date_start"/>
+                            </div>
+                            <t t-if="record.physician_id.raw_value">
+                                <div class="text-muted small">
+                                    Doctor: <field name="physician_id"/>
+                                </div>
+                            </t>
+                            <t t-if="record.department_id.raw_value">
+                                <div class="text-muted small">
+                                    Dept: <field name="department_id"/>
+                                </div>
+                            </t>
+                        </div>
+
+                        <div class="o_kanban_footer mt-2">
+                            <button name="action_call_this_patient"
+                                    type="object"
+                                    string="Call Patient"
+                                    class="btn btn-primary btn-sm w-100"
+                                    groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         Patient Queue — Search View
+    ============================================================ -->
+    <record id="view_bista_queue_search" model="ir.ui.view">
+        <field name="name">bista.queue.appointment.search</field>
+        <field name="model">hms.appointment</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <search string="Patient Queue">
+                <field name="patient_id"/>
+                <field name="department_id"/>
+                <field name="physician_id"/>
+                <field name="bista_queue_token" string="Token"/>
+                <separator/>
+                <filter string="Medical Emergency" name="filter_emergency"
+                        domain="[('urgency', '=', 'medical_emergency')]"/>
+                <filter string="Urgent" name="filter_urgent"
+                        domain="[('urgency', '=', 'urgent')]"/>
+                <filter string="Normal" name="filter_normal"
+                        domain="[('urgency', '=', 'normal')]"/>
+                <separator/>
+                <group>
+                    <filter string="Department" name="grp_department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter string="Physician" name="grp_physician"
+                            context="{'group_by': 'physician_id'}"/>
+                    <filter string="Urgency" name="grp_urgency"
+                            context="{'group_by': 'urgency'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         Patient Queue — Window Action
+    ============================================================ -->
+    <record id="action_bista_patient_queue" model="ir.actions.act_window">
+        <field name="name">Patient Queue</field>
+        <field name="res_model">hms.appointment</field>
+        <field name="view_mode">list,kanban</field>
+        <field name="domain">[('state', '=', 'waiting')]</field>
+        <field name="search_view_id" ref="view_bista_queue_search"/>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'list',   'view_id': ref('view_bista_queue_list')}),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_bista_queue_kanban')}),
+        ]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No patients waiting</p>
+            <p>Patients appear here once their appointment is moved to the
+               <strong>Waiting</strong> state.</p>
+        </field>
+    </record>
+
+</odoo>

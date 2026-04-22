@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="view_bista_admission_queue_list" model="ir.ui.view">
+        <field name="name">bista.admission.queue.list</field>
+        <field name="model">hms.admission</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <list string="Admission Queue"
+                  default_order="admission_queue_priority asc, admission_datetime asc"
+                  create="false"
+                  delete="false"
+                  decoration-danger="admission_type == 'emergency'"
+                  decoration-warning="admission_type == 'maternity'">
+                <field name="admission_queue_token" string="Token" optional="show"/>
+                <field name="name" string="Admission No."/>
+                <field name="patient_id"/>
+                <field name="admission_type" widget="badge"
+                       decoration-danger="admission_type == 'emergency'"
+                       decoration-warning="admission_type == 'maternity'"
+                       decoration-info="admission_type == 'transfer'"
+                       decoration-success="admission_type in ('elective', 'appointment')"/>
+                <field name="ward_id"/>
+                <field name="bed_id"/>
+                <field name="attending_physician_id"/>
+                <field name="admission_datetime" string="Confirmed Since"/>
+                <field name="admission_queue_priority" column_invisible="1"/>
+                <button name="action_call_this_admission"
+                        string="Admit Patient"
+                        type="object"
+                        icon="fa-sign-in"
+                        class="btn-primary btn-sm"
+                        groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_bista_admission_queue_kanban" model="ir.ui.view">
+        <field name="name">bista.admission.queue.kanban</field>
+        <field name="model">hms.admission</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <kanban string="Admission Queue"
+                    default_group_by="ward_id"
+                    default_order="admission_queue_priority asc, admission_datetime asc"
+                    create="false">
+                <field name="admission_queue_token"/>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="admission_type"/>
+                <field name="ward_id"/>
+                <field name="bed_id"/>
+                <field name="attending_physician_id"/>
+                <field name="admission_datetime"/>
+                <field name="admission_queue_priority"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="p-2 mb-1 rounded
+                            #{record.admission_type.raw_value == 'emergency' ? 'bg-danger text-white' :
+                              record.admission_type.raw_value == 'maternity' ? 'bg-warning' : 'bg-success text-white'}">
+                            <strong><t t-esc="record.admission_queue_token.value or record.name.value"/></strong>
+                        </div>
+                        <div class="o_kanban_record_body">
+                            <field name="patient_id" class="fw-bold"/>
+                            <field name="admission_type" widget="badge"
+                                   decoration-danger="admission_type == 'emergency'"
+                                   decoration-warning="admission_type == 'maternity'"
+                                   decoration-info="admission_type == 'transfer'"
+                                   decoration-success="admission_type in ('elective', 'appointment')"/>
+                            <div t-if="record.attending_physician_id.value">
+                                <i class="fa fa-user-md me-1"/>
+                                <field name="attending_physician_id"/>
+                            </div>
+                            <div>
+                                <i class="fa fa-clock-o me-1"/>
+                                <field name="admission_datetime"/>
+                            </div>
+                            <div t-if="record.bed_id.value">
+                                <i class="fa fa-bed me-1"/>
+                                <field name="bed_id"/>
+                            </div>
+                        </div>
+                        <div class="o_kanban_record_bottom">
+                            <div class="oe_kanban_bottom_right">
+                                <button name="action_call_this_admission"
+                                        string="Admit Patient"
+                                        type="object"
+                                        class="btn btn-primary btn-sm"
+                                        groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_bista_admission_queue_search" model="ir.ui.view">
+        <field name="name">bista.admission.queue.search</field>
+        <field name="model">hms.admission</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <search string="Admission Queue">
+                <field name="patient_id"/>
+                <field name="ward_id"/>
+                <field name="attending_physician_id"/>
+                <field name="admission_queue_token" string="Token"/>
+                <filter name="emergency" string="Emergency"
+                        domain="[('admission_type', '=', 'emergency')]"/>
+                <filter name="maternity" string="Maternity"
+                        domain="[('admission_type', '=', 'maternity')]"/>
+                <filter name="transfer" string="Transfer"
+                        domain="[('admission_type', '=', 'transfer')]"/>
+                <filter name="elective" string="Elective"
+                        domain="[('admission_type', '=', 'elective')]"/>
+                <filter name="appointment" string="From Appointment"
+                        domain="[('admission_type', '=', 'appointment')]"/>
+                <group>
+                    <filter name="group_ward" string="Ward"
+                            context="{'group_by': 'ward_id'}"/>
+                    <filter name="group_type" string="Admission Type"
+                            context="{'group_by': 'admission_type'}"/>
+                    <filter name="group_physician" string="Physician"
+                            context="{'group_by': 'attending_physician_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_bista_admission_queue" model="ir.actions.act_window">
+        <field name="name">Admission Queue</field>
+        <field name="res_model">hms.admission</field>
+        <field name="view_mode">list,kanban</field>
+        <field name="domain">[('state', '=', 'confirmed')]</field>
+        <field name="search_view_id" ref="view_bista_admission_queue_search"/>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_bista_admission_queue_list')}),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_bista_admission_queue_kanban')}),
+        ]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No confirmed admissions in the queue
+            </p>
+            <p>
+                Confirm an admission to add it to the queue.
+            </p>
+        </field>
+    </record>
+
+</odoo>

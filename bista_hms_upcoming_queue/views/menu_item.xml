@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         Under "Patient Queue" root (from bista_hms_queue)
+         sequence=5 — appears before Waiting Queue (seq=10)
+    ============================================================ -->
+    <menuitem id="menu_bista_upcoming_queue_live"
+              name="Upcoming Queue"
+              parent="bista_hms_queue.menu_bista_queue_root"
+              action="bista_hms_upcoming_queue.action_bista_upcoming_queue"
+              sequence="5"
+              groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+
+    <!-- All records for managers -->
+    <menuitem id="menu_bista_upcoming_queue_all"
+              name="All Upcoming Records"
+              parent="bista_hms_queue.menu_bista_queue_root"
+              action="bista_hms_upcoming_queue.action_bista_upcoming_queue_all"
+              sequence="20"
+              groups="acs_hms_base.group_hms_manager"/>
+
+    <!-- ============================================================
+         Under Appointments menu (acs_hms.main_menu_appointment)
+         sequence=12 — between Appointments (seq=10) and Patient Queue (seq=15)
+    ============================================================ -->
+    <menuitem id="menu_bista_upcoming_queue_under_appointment"
+              name="Upcoming Queue"
+              parent="acs_hms.main_menu_appointment"
+              action="bista_hms_upcoming_queue.action_bista_upcoming_queue"
+              sequence="12"
+              groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+
+    <!-- ============================================================
+         Under Reception menu (bista_hms_emergency.menu_bista_reception_root)
+         Most natural home for pre-registration workflow
+    ============================================================ -->
+    <menuitem id="menu_bista_upcoming_queue_under_reception"
+              name="Upcoming Queue"
+              parent="bista_hms_emergency.menu_bista_reception_root"
+              action="bista_hms_upcoming_queue.action_bista_upcoming_queue"
+              sequence="10"
+              groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+
+</odoo>

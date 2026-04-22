@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         TOP-LEVEL: Patient Queue (sequence 62 — after IPD=61)
+    ============================================================ -->
+    <menuitem id="menu_bista_queue_root"
+              name="Patient Queue"
+              sequence="62"
+              groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+
+    <menuitem id="menu_bista_queue_live"
+              name="Waiting Queue"
+              parent="menu_bista_queue_root"
+              action="bista_hms_queue.action_bista_patient_queue"
+              sequence="10"
+              groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+
+    <!-- ============================================================
+         UNDER EXISTING APPOINTMENTS MENU
+    ============================================================ -->
+    <menuitem id="menu_bista_queue_under_appointment"
+              name="Patient Queue"
+              parent="acs_hms.main_menu_appointment"
+              action="bista_hms_queue.action_bista_patient_queue"
+              sequence="15"
+              groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+
+    <!-- ============================================================
+         CONFIGURATION — Queue Counters (manager only)
+    ============================================================ -->
+    <menuitem id="menu_bista_queue_counters"
+              name="Queue Counters"
+              parent="acs_hms.menu_hms_configuration"
+              action="bista_hms_queue.action_bista_queue_counter"
+              sequence="50"
+              groups="acs_hms_base.group_hms_manager"/>
+
+</odoo>

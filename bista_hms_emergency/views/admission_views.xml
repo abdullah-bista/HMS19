@@ -12,36 +12,71 @@
             <form>
                 <header>
                     <button name="action_confirm" string="Confirm" type="object"
-                        invisible="state != 'draft'" class="btn-primary"/>
+                            invisible="state != 'draft'" class="btn-primary"/>
                     <button name="action_admit" string="Admit Patient" type="object"
-                        invisible="state != 'confirmed'" class="btn-primary"/>
+                            invisible="state != 'confirmed'" class="btn-primary"/>
                     <button name="action_mark_treatment_done" string="Mark Treatment Done" type="object"
-                        invisible="state != 'in_progress'" class="btn-primary"/>
+                            invisible="state != 'in_progress'" class="btn-primary"/>
                     <button name="action_initiate_discharge" string="Discharge" type="object"
-                        invisible="state not in ('in_progress', 'treatment_done')"/>
+                            invisible="state not in ('in_progress', 'treatment_done')"/>
                     <button name="action_cancel" string="Cancel" type="object"
-                        invisible="state in ('discharged', 'cancelled')"
-                        confirm="Are you sure you want to cancel this admission?"/>
+                            invisible="state in ('discharged', 'cancelled')"
+                            confirm="Are you sure you want to cancel this admission?"/>
                     <field name="state" widget="statusbar"
-                        statusbar_visible="draft,confirmed,in_progress,treatment_done,discharged"/>
+                           statusbar_visible="draft,confirmed,in_progress,treatment_done,discharged"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+                        <button name="action_create_invoice" type="object"
+                                class="oe_stat_button" icon="fa-plus"
+                                invisible="state not in ('in_progress', 'discharged')">
+                            <span class="o_stat_text">Create Invoice</span>
+                        </button>
                         <button name="action_view_invoices" type="object"
-                            class="oe_stat_button" icon="fa-money"
-                            invisible="invoice_count == 0">
+                                class="oe_stat_button" icon="fa-money"
+                                invisible="invoice_count == 0">
                             <div class="o_stat_info">
                                 <field name="invoice_count" class="o_stat_value"/>
                                 <span class="o_stat_text">Invoices</span>
                             </div>
                         </button>
-                        <button name="action_create_invoice" type="object"
-                            class="oe_stat_button" icon="fa-plus"
-                            invisible="state not in ('in_progress', 'discharged')">
-                            <span class="o_stat_text">Create Invoice</span>
+                        <button name="action_view_treatments" type="object"
+                                class="oe_stat_button" icon="fa-heartbeat">
+                            <div class="o_stat_info">
+                                <field name="treatment_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Treatments</span>
+                            </div>
+                        </button>
+                        <button name="action_view_nursing_sheets" type="object"
+                                class="oe_stat_button" icon="fa-clipboard">
+                            <div class="o_stat_info">
+                                <field name="nursing_sheet_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Nursing</span>
+                            </div>
+                        </button>
+                        <button name="action_view_lab_requests" type="object"
+                                class="oe_stat_button" icon="fa-flask">
+                            <div class="o_stat_info">
+                                <field name="lab_request_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Lab Requests</span>
+                            </div>
+                        </button>
+                        <button name="action_view_prescriptions" type="object"
+                                class="oe_stat_button" icon="fa-medkit">
+                            <div class="o_stat_info">
+                                <field name="prescription_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Prescriptions</span>
+                            </div>
+                        </button>
+                        <button name="action_view_procedures" type="object"
+                                class="oe_stat_button" icon="fa-stethoscope">
+                            <div class="o_stat_info">
+                                <field name="procedure_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Procedures</span>
+                            </div>
                         </button>
                         <button name="action_view_ot_bookings" type="object"
-                            class="oe_stat_button" icon="fa-hospital-o">
+                                class="oe_stat_button" icon="fa-hospital-o">
                             <div class="o_stat_info">
                                 <field name="ot_booking_count" class="o_stat_value"/>
                                 <span class="o_stat_text">OT Bookings</span>
@@ -57,11 +92,15 @@
 
                     <!-- Current Admission Banner -->
                     <div class="alert alert-info" role="alert"
-                        invisible="state != 'in_progress'">
+                         invisible="state != 'in_progress'">
                         <i class="fa fa-hospital-o me-2"/>
                         Patient is currently admitted.
                         <span invisible="not length_of_stay">
-                            Length of stay: <strong><field name="length_of_stay" nolabel="1"/> day(s)</strong>
+                            Length of stay:
+                            <strong>
+                                <field name="length_of_stay" nolabel="1"/>
+                                day(s)
+                            </strong>
                         </span>
                     </div>
 
@@ -71,42 +110,44 @@
                             <field name="admission_datetime"/>
                             <field name="admission_type"/>
                             <field name="emergency_case_id" options="{'no_create': True}"
-                                invisible="admission_type != 'emergency'"/>
+                                   invisible="admission_type != 'emergency'"/>
+                            <field name="appointment_id" options="{'no_create': True}"
+                                   invisible="admission_type != 'appointment'"/>
                         </group>
                         <group string="Physicians">
                             <field name="attending_physician_id" options="{'no_create': True}"/>
                             <field name="referring_physician_id" options="{'no_create': True}"/>
                             <field name="secondary_physician_ids" widget="many2many_tags"
-                                options="{'no_create': True}"/>
+                                   options="{'no_create': True}"/>
                         </group>
                     </group>
 
                     <group string="Reason for Admission">
-                        <field name="admission_reason" nolabel="1"
-                            placeholder="Clinical indication for admission..."/>
+                        <field name="admission_reason" nolabel="1" colspan="4"
+                               placeholder="Clinical indication for admission..."/>
                     </group>
 
                     <!-- Bed Assignment -->
                     <group string="Bed Assignment">
                         <group>
                             <field name="ward_id"
-                                options="{'no_create': True}"
-                                readonly="state in ('in_progress', 'discharged', 'cancelled')"/>
+                                   options="{'no_create': True}"
+                                   readonly="state in ('in_progress', 'discharged', 'cancelled')"/>
                             <field name="room_id"
-                                domain="[('ward_id', '=', ward_id)]"
-                                options="{'no_create': True}"
-                                readonly="state in ('in_progress', 'discharged', 'cancelled')"/>
+                                   domain="[('ward_id', '=', ward_id)]"
+                                   options="{'no_create': True}"
+                                   readonly="state in ('in_progress', 'discharged', 'cancelled')"/>
                             <field name="bed_id"
-                                domain="[('room_id', '=', room_id), ('state', 'in', ('available', 'reserved'))]"
-                                options="{'no_create': True}"
-                                readonly="state in ('in_progress', 'discharged', 'cancelled')"/>
+                                   domain="[('room_id', '=', room_id), ('state', 'in', ('available', 'reserved'))]"
+                                   options="{'no_create': True}"
+                                   readonly="state in ('in_progress', 'discharged', 'cancelled')"/>
                         </group>
                         <group>
                             <field name="expected_discharge_date"/>
                             <field name="treatment_done_datetime"
-                                invisible="state not in ('treatment_done', 'discharged')"/>
+                                   invisible="state not in ('treatment_done', 'discharged')"/>
                             <field name="actual_discharge_datetime"
-                                invisible="state not in ('discharged',)"/>
+                                   invisible="state not in ('discharged',)"/>
                             <field name="length_of_stay" invisible="state == 'draft'"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
@@ -124,7 +165,7 @@
 
                         <page string="Treatments" name="treatments">
                             <field name="treatment_ids"
-                                context="{
+                                   context="{
                                     'default_patient_id': patient_id,
                                     'default_physician_id': attending_physician_id,
                                 }">
@@ -134,9 +175,9 @@
                                     <field name="physician_id"/>
                                     <field name="diagnosis_id"/>
                                     <field name="state" widget="badge"
-                                        decoration-info="state == 'draft'"
-                                        decoration-success="state == 'done'"
-                                        decoration-muted="state == 'cancel'"/>
+                                           decoration-info="state == 'draft'"
+                                           decoration-success="state == 'done'"
+                                           decoration-muted="state == 'cancel'"/>
                                 </list>
                             </field>
                         </page>
@@ -145,7 +186,7 @@
 
                         <page string="Lab Requests" name="lab_requests">
                             <field name="lab_request_ids"
-                                context="{
+                                   context="{
                                     'default_patient_id': patient_id,
                                     'default_physician_id': attending_physician_id,
                                 }">
@@ -154,16 +195,16 @@
                                     <field name="date"/>
                                     <field name="physician_id"/>
                                     <field name="state" widget="badge"
-                                        decoration-info="state == 'draft'"
-                                        decoration-success="state == 'done'"
-                                        decoration-muted="state == 'cancel'"/>
+                                           decoration-info="state == 'draft'"
+                                           decoration-success="state == 'done'"
+                                           decoration-muted="state == 'cancel'"/>
                                 </list>
                             </field>
                         </page>
 
                         <page string="Prescriptions" name="prescriptions">
                             <field name="prescription_ids"
-                                context="{
+                                   context="{
                                     'default_patient_id': patient_id,
                                     'default_physician_id': attending_physician_id,
                                 }">
@@ -172,16 +213,16 @@
                                     <field name="prescription_date"/>
                                     <field name="physician_id"/>
                                     <field name="state" widget="badge"
-                                        decoration-info="state == 'draft'"
-                                        decoration-success="state == 'prescription'"
-                                        decoration-muted="state == 'canceled'"/>
+                                           decoration-info="state == 'draft'"
+                                           decoration-success="state == 'prescription'"
+                                           decoration-muted="state == 'canceled'"/>
                                 </list>
                             </field>
                         </page>
 
                         <page string="Procedures (OT)" name="procedures">
                             <field name="procedure_ids"
-                                context="{
+                                   context="{
                                     'default_patient_id': patient_id,
                                     'default_physician_id': attending_physician_id,
                                 }">
@@ -191,33 +232,138 @@
                                     <field name="date"/>
                                     <field name="physician_id"/>
                                     <field name="state" widget="badge"
-                                        decoration-info="state == 'scheduled'"
-                                        decoration-success="state == 'done'"
-                                        decoration-muted="state == 'cancel'"/>
+                                           decoration-info="state == 'scheduled'"
+                                           decoration-success="state == 'done'"
+                                           decoration-muted="state == 'cancel'"/>
                                 </list>
                             </field>
                         </page>
 
+                        <page string="Patient History" name="patient_history">
+                            <div class="alert alert-info" role="alert">
+                                <i class="fa fa-history me-1"/>
+                                Complete medical history for this patient across all visits and admissions.
+                            </div>
+                            <notebook>
+                                <page name="patient_appointments" string="Appointments">
+                                    <field name="patient_appointment_ids" readonly="1">
+                                        <list open_form_view="True" default_order="date desc">
+                                            <field name="name" string="Ref"/>
+                                            <field name="date" string="Date"/>
+                                            <field name="physician_id"/>
+                                            <field name="department_id"/>
+                                            <field name="state" widget="badge"
+                                                   decoration-info="state == 'confirm'"
+                                                   decoration-warning="state == 'waiting'"
+                                                   decoration-success="state == 'done'"
+                                                   decoration-muted="state == 'cancel'"/>
+                                        </list>
+                                    </field>
+                                </page>
+
+                                <page name="patient_lab_requests" string="Lab Requests">
+                                    <field name="patient_lab_request_ids" readonly="1">
+                                        <list open_form_view="True" default_order="date desc">
+                                            <field name="name" string="Ref"/>
+                                            <field name="date"/>
+                                            <field name="physician_id"/>
+                                            <field name="state" widget="badge"
+                                                   decoration-info="state == 'draft'"
+                                                   decoration-success="state == 'done'"
+                                                   decoration-muted="state == 'cancel'"/>
+                                        </list>
+                                    </field>
+                                </page>
+
+                                <page name="patient_precriptions" string="Prescriptions">
+                                    <field name="patient_prescription_ids" readonly="1">
+                                        <list open_form_view="True" default_order="prescription_date desc">
+                                            <field name="name" string="Ref"/>
+                                            <field name="prescription_date" string="Date"/>
+                                            <field name="physician_id"/>
+                                            <field name="state" widget="badge"
+                                                   decoration-info="state == 'draft'"
+                                                   decoration-success="state == 'prescription'"
+                                                   decoration-muted="state == 'canceled'"/>
+                                        </list>
+                                    </field>
+                                </page>
+
+                                <page name="patient_treatments" string="Treatments">
+                                    <field name="patient_treatment_ids" readonly="1">
+                                        <list open_form_view="True" default_order="date desc">
+                                            <field name="name" string="Ref"/>
+                                            <field name="date"/>
+                                            <field name="physician_id"/>
+                                            <field name="diagnosis_id"/>
+                                            <field name="state" widget="badge"
+                                                   decoration-info="state == 'draft'"
+                                                   decoration-success="state == 'done'"
+                                                   decoration-muted="state == 'cancel'"/>
+                                        </list>
+                                    </field>
+                                </page>
+
+                                <page name="patient_procedures" string="Procedures (OT)">
+                                    <field name="patient_procedure_ids" readonly="1">
+                                        <list open_form_view="True" default_order="date desc">
+                                            <field name="name" string="Ref"/>
+                                            <field name="product_id"/>
+                                            <field name="date"/>
+                                            <field name="physician_id"/>
+                                            <field name="state" widget="badge"
+                                                   decoration-info="state == 'scheduled'"
+                                                   decoration-success="state == 'done'"
+                                                   decoration-muted="state == 'cancel'"/>
+                                        </list>
+                                    </field>
+                                </page>
+
+                                <page name="patient_evaluations" string="Evaluations">
+                                    <field name="patient_procedure_ids" readonly="1">
+                                        <list open_form_view="True" default_order="date desc">
+                                            <field name="name" string="Ref"/>
+                                            <field name="product_id"/>
+                                            <field name="date"/>
+                                            <field name="physician_id"/>
+                                            <field name="state" widget="badge"
+                                                   decoration-info="state == 'scheduled'"
+                                                   decoration-success="state == 'done'"
+                                                   decoration-muted="state == 'cancel'"/>
+                                        </list>
+                                    </field>
+                                </page>
+                            </notebook>
+
+                        </page>
+
                         <page string="Financial Summary" name="financials">
+                            <div class="alert alert-info" role="alert">
+                                <i class="fa fa-info-circle me-1"/>
+                                Totals include invoices from bed charges, treatments, lab requests, procedures, and
+                                prescriptions.
+                            </div>
                             <group>
                                 <group>
                                     <field name="total_invoiced"/>
                                     <field name="total_paid"/>
                                 </group>
                                 <group>
-                                    <field name="balance_due"/>
+                                    <field name="balance_due"
+                                           decoration-danger="balance_due &gt; 0"/>
                                 </group>
                             </group>
-                            <field name="invoice_ids">
+                            <field name="all_invoice_ids">
                                 <list>
                                     <field name="name"/>
                                     <field name="invoice_date"/>
+                                    <field name="invoice_origin" string="Source"/>
                                     <field name="amount_total"/>
-                                    <field name="amount_residual"/>
+                                    <field name="amount_residual" string="Due"/>
                                     <field name="payment_state" widget="badge"
-                                        decoration-success="payment_state == 'paid'"
-                                        decoration-warning="payment_state == 'partial'"
-                                        decoration-info="payment_state == 'not_paid'"/>
+                                           decoration-success="payment_state == 'paid'"
+                                           decoration-warning="payment_state == 'partial'"
+                                           decoration-info="payment_state == 'not_paid'"/>
                                 </list>
                             </field>
                         </page>
@@ -247,10 +393,10 @@
                 <field name="expected_discharge_date"/>
                 <field name="length_of_stay"/>
                 <field name="state" widget="badge"
-                    decoration-info="state == 'draft'"
-                    decoration-warning="state == 'confirmed'"
-                    decoration-success="state == 'in_progress'"
-                    decoration-muted="state in ('discharged', 'cancelled')"/>
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'confirmed'"
+                       decoration-success="state == 'in_progress'"
+                       decoration-muted="state in ('discharged', 'cancelled')"/>
             </list>
         </field>
     </record>
@@ -277,7 +423,9 @@
                         <div class="oe_kanban_card oe_kanban_global_click">
                             <div class="oe_kanban_content p-2">
                                 <div class="d-flex justify-content-between mb-1">
-                                    <strong><field name="name"/></strong>
+                                    <strong>
+                                        <field name="name"/>
+                                    </strong>
                                     <span t-attf-class="badge rounded-pill
                                         #{record.state.raw_value == 'in_progress' ? 'bg-success' :
                                           record.state.raw_value == 'confirmed' ? 'bg-warning' :
@@ -286,21 +434,27 @@
                                     </span>
                                 </div>
                                 <div class="fw-bold">
-                                    <i class="fa fa-user"/> <field name="patient_id"/>
+                                    <i class="fa fa-user"/>
+                                    <field name="patient_id"/>
                                 </div>
                                 <div class="small mt-1">
-                                    <i class="fa fa-bed"/> <field name="bed_id"/>
+                                    <i class="fa fa-bed"/>
+                                    <field name="bed_id"/>
                                     <span t-if="record.ward_id.raw_value" class="ms-1 text-muted">
                                         (<field name="ward_id"/>)
                                     </span>
                                 </div>
                                 <div t-if="record.attending_physician_id.raw_value" class="small mt-1">
-                                    <i class="fa fa-user-md"/> <field name="attending_physician_id"/>
+                                    <i class="fa fa-user-md"/>
+                                    <field name="attending_physician_id"/>
                                 </div>
                                 <div class="small mt-1 text-muted">
-                                    <i class="fa fa-clock-o"/> <field name="admission_datetime"/>
+                                    <i class="fa fa-clock-o"/>
+                                    <field name="admission_datetime"/>
                                     <span t-if="record.length_of_stay.raw_value" class="ms-2">
-                                        (<field name="length_of_stay"/> days)
+                                        (
+                                        <field name="length_of_stay"/>
+                                        days)
                                     </span>
                                 </div>
                             </div>
@@ -332,10 +486,10 @@
                 <filter string="Cancelled" name="cancelled" domain="[('state','=','cancelled')]"/>
                 <separator/>
                 <filter string="Emergency Admissions" name="emergency"
-                    domain="[('admission_type','=','emergency')]"/>
+                        domain="[('admission_type','=','emergency')]"/>
                 <separator/>
                 <filter string="Today" name="today"
-                    domain="[('admission_datetime','&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00'))]"/>
+                        domain="[('admission_datetime','&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00'))]"/>
                 <group>
                     <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
                     <filter string="Ward" name="group_ward" context="{'group_by': 'ward_id'}"/>
@@ -355,6 +509,7 @@
         <field name="name">All Admissions</field>
         <field name="res_model">hms.admission</field>
         <field name="view_mode">list,kanban,form</field>
+        <field name="context">{'group_by': ['admission_type']}</field>
     </record>
 
     <record id="action_admission_current" model="ir.actions.act_window">

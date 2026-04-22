@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         Inject queue token + "Call Patient" button into the
+         existing appointment form view.
+    ============================================================ -->
+    <record id="view_hms_appointment_form_inherit_queue" model="ir.ui.view">
+        <field name="name">hms.appointment.form.inherit.queue</field>
+        <field name="model">hms.appointment</field>
+        <field name="inherit_id" ref="acs_hms.view_hms_appointment_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Token smart button in the button_box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <div class="oe_stat_button"
+                     invisible="not bista_queue_token"
+                     title="Queue Token">
+                    <i class="fa fa-ticket o_button_icon"/>
+                    <div class="o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="bista_queue_token"/>
+                        </span>
+                        <span class="o_stat_text">Queue Token</span>
+                    </div>
+                </div>
+            </xpath>
+
+            <!-- "Call Patient" header button — visible when state is 'waiting' -->
+            <xpath expr="//header" position="inside">
+                <button name="action_call_this_patient"
+                        string="Call Patient"
+                        type="object"
+                        invisible="state != 'waiting'"
+                        class="btn-primary"
+                        groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

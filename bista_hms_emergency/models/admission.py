@@ -25,12 +25,16 @@ class HmsAdmission(models.Model):
         ('elective', 'Elective'),
         ('transfer', 'Transfer'),
         ('maternity', 'Maternity'),
+        ('appointment', 'Appointment'),
     ], string='Admission Type', required=True, default='elective', tracking=True)
     admission_reason = fields.Text(string='Reason for Admission', required=True)
 
     # Source
     emergency_case_id = fields.Many2one(
         'hms.emergency.case', string='Emergency Case', ondelete='set null', tracking=True
+    )
+    appointment_id = fields.Many2one(
+        'hms.appointment', string='Source Appointment', ondelete='set null', tracking=True
     )
 
     # Physicians
@@ -89,6 +93,13 @@ class HmsAdmission(models.Model):
         string='Invoices', copy=False
     )
     invoice_count = fields.Integer(compute='_compute_financials')
+
+    all_invoice_ids = fields.Many2many(
+        'account.move',
+        string='All Invoices',
+        compute='_compute_all_invoices',
+        store=False,  # always fresh, no storage overhead
+    )
     total_invoiced = fields.Float(
         string='Total Invoiced', compute='_compute_financials', digits='Account'
     )
@@ -113,6 +124,26 @@ class HmsAdmission(models.Model):
         default=lambda self: self.env.company
     )
 
+    # ── Smart-button counts ─────────────────────────────────────────
+    treatment_count = fields.Integer(compute='_compute_clinical_counts')
+    lab_request_count = fields.Integer(compute='_compute_clinical_counts')
+    prescription_count = fields.Integer(compute='_compute_clinical_counts')
+    procedure_count = fields.Integer(compute='_compute_clinical_counts')
+
+    # ── Patient History (all records across all admissions) ──────────
+    patient_appointment_ids = fields.Many2many(
+        'hms.appointment', string='Appointments', compute='_compute_patient_history')
+    patient_lab_request_ids = fields.Many2many(
+        'acs.laboratory.request', string='Lab Requests', compute='_compute_patient_history')
+    patient_prescription_ids = fields.Many2many(
+        'prescription.order', string='Prescriptions', compute='_compute_patient_history')
+    patient_treatment_ids = fields.Many2many(
+        'hms.treatment', string='Treatments', compute='_compute_patient_history')
+    patient_procedure_ids = fields.Many2many(
+        'acs.patient.procedure', string='Procedures', compute='_compute_patient_history')
+    patient_evaluation_ids = fields.Many2many(
+        'acs.patient.evaluation', string='Evaluations', compute='_compute_patient_history')
+
     # ---------------------------------------------------------------
     # ORM Overrides
     # ---------------------------------------------------------------
@@ -122,7 +153,11 @@ class HmsAdmission(models.Model):
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('hms.admission') or 'New'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        for rec in records:
+            if rec.appointment_id and not rec.appointment_id.admission_id:
+                rec.appointment_id.admission_id = rec.id
+        return records
 
     # ---------------------------------------------------------------
     # Onchange — bed cascade
@@ -151,11 +186,84 @@ class HmsAdmission(models.Model):
             else:
                 rec.length_of_stay = 0
 
-    @api.depends('invoice_ids', 'invoice_ids.amount_total', 'invoice_ids.amount_residual', 'invoice_ids.state')
+    @api.depends('treatment_ids', 'lab_request_ids', 'prescription_ids', 'procedure_ids')
+    def _compute_clinical_counts(self):
+        for rec in self:
+            rec.treatment_count = len(rec.treatment_ids)
+            rec.lab_request_count = len(rec.lab_request_ids)
+            rec.prescription_count = len(rec.prescription_ids)
+            rec.procedure_count = len(rec.procedure_ids)
+
+    @api.depends('patient_id')
+    def _compute_patient_history(self):
+        Appointment = self.env['hms.appointment']
+        LabRequest = self.env['acs.laboratory.request']
+        Prescription = self.env['prescription.order']
+        Treatment = self.env['hms.treatment']
+        Procedure = self.env['acs.patient.procedure']
+        Evaluation = self.env['acs.patient.evaluation']
+        for rec in self:
+            if rec.patient_id:
+                pid = rec.patient_id.id
+                rec.patient_appointment_ids = Appointment.search([('patient_id', '=', pid)])
+                rec.patient_lab_request_ids = LabRequest.search([('patient_id', '=', pid)])
+                rec.patient_prescription_ids = Prescription.search([('patient_id', '=', pid)])
+                rec.patient_treatment_ids = Treatment.search([('patient_id', '=', pid)])
+                rec.patient_procedure_ids = Procedure.search([('patient_id', '=', pid)])
+                rec.patient_evaluation_ids = Evaluation.search([('patient_id', '=', pid)])
+            else:
+                rec.patient_appointment_ids = False
+                rec.patient_lab_request_ids = False
+                rec.patient_prescription_ids = False
+                rec.patient_treatment_ids = False
+                rec.patient_procedure_ids = False
+                rec.patient_evaluation_ids = False
+
+    @api.depends(
+        'invoice_ids',
+        'treatment_ids',
+        'treatment_ids.invoice_id',
+        'lab_request_ids',
+        'lab_request_ids.invoice_id',
+        'procedure_ids',
+        'procedure_ids.invoice_id',
+    )
+    def _compute_all_invoices(self):
+        for rec in self:
+            rec.all_invoice_ids = rec._get_all_invoices()
+
+    def _get_all_invoices(self):
+        """Collect all invoices linked to this admission across all clinical records."""
+        self.ensure_one()
+        # Manually linked bed/registration invoices
+        all_invoices = self.invoice_ids
+        # Treatment invoices
+        all_invoices |= self.treatment_ids.mapped('invoice_id').filtered(lambda i: i.id)
+        # combined invoices of the treatments
+        all_invoices |= self.treatment_ids.patient_procedure_ids.mapped('invoice_id').filtered(lambda i: i.id)
+        # Lab request invoices
+        all_invoices |= self.lab_request_ids.mapped('invoice_id').filtered(lambda i: i.id)
+        # Procedure invoices
+        all_invoices |= self.procedure_ids.mapped('invoice_id').filtered(lambda i: i.id)
+        # Prescription invoices (if present)
+        if hasattr(self.prescription_ids, 'invoice_id'):
+            all_invoices |= self.prescription_ids.mapped('invoice_id').filtered(lambda i: i.id)
+        return all_invoices
+
+    @api.depends(
+        'invoice_ids', 'invoice_ids.amount_total', 'invoice_ids.amount_residual', 'invoice_ids.state',
+        'treatment_ids.invoice_id', 'treatment_ids.invoice_id.amount_total',
+        'treatment_ids.invoice_id.amount_residual', 'treatment_ids.invoice_id.state',
+        'lab_request_ids.invoice_id', 'lab_request_ids.invoice_id.amount_total',
+        'lab_request_ids.invoice_id.amount_residual', 'lab_request_ids.invoice_id.state',
+        'procedure_ids.invoice_id', 'procedure_ids.invoice_id.amount_total',
+        'procedure_ids.invoice_id.amount_residual', 'procedure_ids.invoice_id.state',
+    )
     def _compute_financials(self):
         for rec in self:
-            active_invoices = rec.invoice_ids.filtered(lambda inv: inv.state != 'cancel')
-            rec.invoice_count = len(rec.invoice_ids)
+            all_invoices = rec._get_all_invoices()
+            active_invoices = all_invoices.filtered(lambda inv: inv.state != 'cancel')
+            rec.invoice_count = len(all_invoices)
             rec.total_invoiced = sum(active_invoices.mapped('amount_total'))
             rec.balance_due = sum(active_invoices.mapped('amount_residual'))
             rec.total_paid = rec.total_invoiced - rec.balance_due
@@ -285,6 +393,66 @@ class HmsAdmission(models.Model):
             'context': {
                 'default_admission_id': self.id,
                 'default_patient_id': self.patient_id.id,
+            },
+        }
+
+    def action_view_treatments(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Treatments'),
+            'res_model': 'hms.treatment',
+            'view_mode': 'list,form',
+            'domain': [('admission_id', '=', self.id)],
+            'context': {
+                'default_admission_id': self.id,
+                'default_patient_id': self.patient_id.id,
+                'default_physician_id': self.attending_physician_id.id,
+            },
+        }
+
+    def action_view_lab_requests(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Lab Requests'),
+            'res_model': 'acs.laboratory.request',
+            'view_mode': 'list,form',
+            'domain': [('admission_id', '=', self.id)],
+            'context': {
+                'default_admission_id': self.id,
+                'default_patient_id': self.patient_id.id,
+                'default_physician_id': self.attending_physician_id.id,
+            },
+        }
+
+    def action_view_prescriptions(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Prescriptions'),
+            'res_model': 'prescription.order',
+            'view_mode': 'list,form',
+            'domain': [('admission_id', '=', self.id)],
+            'context': {
+                'default_admission_id': self.id,
+                'default_patient_id': self.patient_id.id,
+                'default_physician_id': self.attending_physician_id.id,
+            },
+        }
+
+    def action_view_procedures(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Procedures'),
+            'res_model': 'acs.patient.procedure',
+            'view_mode': 'list,form',
+            'domain': [('admission_id', '=', self.id)],
+            'context': {
+                'default_admission_id': self.id,
+                'default_patient_id': self.patient_id.id,
+                'default_physician_id': self.attending_physician_id.id,
             },
         }
 

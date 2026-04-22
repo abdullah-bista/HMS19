@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         bista.queue.counter — List View
+    ============================================================ -->
+    <record id="view_bista_queue_counter_list" model="ir.ui.view">
+        <field name="name">bista.queue.counter.list</field>
+        <field name="model">bista.queue.counter</field>
+        <field name="arch" type="xml">
+            <list string="Queue Counters" create="false" delete="false" edit="false">
+                <field name="counter_date"/>
+                <field name="department_id"/>
+                <field name="last_token_number" string="Tokens Issued"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         bista.queue.counter — Form View
+    ============================================================ -->
+    <record id="view_bista_queue_counter_form" model="ir.ui.view">
+        <field name="name">bista.queue.counter.form</field>
+        <field name="model">bista.queue.counter</field>
+        <field name="arch" type="xml">
+            <form string="Queue Counter">
+                <sheet>
+                    <group>
+                        <field name="counter_date"/>
+                        <field name="department_id"/>
+                        <field name="last_token_number" string="Last Token Issued" readonly="1"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         bista.queue.counter — Window Action
+    ============================================================ -->
+    <record id="action_bista_queue_counter" model="ir.actions.act_window">
+        <field name="name">Queue Counters</field>
+        <field name="res_model">bista.queue.counter</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No queue counters yet</p>
+            <p>Counter rows are created automatically when the first patient enters the
+               waiting queue each day.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -171,7 +171,7 @@
                     <notebook>
                         <page name="consumed_products" string="Consumed Products">
                             <label for="acs_kit_id" invisible="state in ('done','cancel')"/>
-                            <div name="acs_kit_id" invisible="state in ('done','cancel')">
+                            <div name="acs_kit_id" invisible="state in ('done','cancel')" colspan="2">
                                 <field name="acs_kit_id" nolabel="1" options="{'no_create': True}"/>
                                 <field name="acs_kit_qty" class="oe_inline" nolabel="1" invisible="not acs_kit_id"/>
                                 <button name="get_acs_kit_lines" string="Add Kit Products" type="object" class="oe_inline fa fa-arrow-right oe_link" invisible="not acs_kit_id"/>
