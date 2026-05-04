@@ -1,0 +1,32 @@
+.o_doctor_dashboard {
+
+    .o_dashboard_header {
+        h3 { color: #2c3e50; }
+    }
+
+    .o_stat_card {
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .o_stat_count {
+            font-size: 2.8rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .o_stat_label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+    }
+
+}

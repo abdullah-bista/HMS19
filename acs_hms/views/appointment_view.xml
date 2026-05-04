@@ -223,12 +223,12 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box" groups="acs_hms.group_hms_receptionist">
                         <button name="action_refer_doctor" string="Refer. To" type="object" invisible="state not in ('in_consultation','invoiced')" class="oe_stat_button" icon="fa-pencil-square-o"/>
-                        <button name="action_view_treatment" string="Treatment" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="state=='done' and not treatment_id"/>
-                        <button name="action_prescription" string="Prescription" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="state=='done' and not prescription_ids"/>
+                        <button name="action_view_treatment" string="Treatment" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="state=='done' and not treatment_id" groups="base.group_system,acs_hms.group_hms_doctor,acs_hms.group_hms_nurse"/>
+                        <button name="action_prescription" string="Prescription" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="state=='done' and not prescription_ids" groups="base.group_system,acs_hms.group_hms_doctor,acs_hms.group_hms_nurse"/>
                         <button class="oe_stat_button" type="object" name="view_invoice" icon="fa-pencil-square-o" invisible="invoice_count==0" groups="account.group_account_invoice">
                             <field string="Invoices" name="invoice_count" widget="statinfo"/>
                         </button>
-                        <button name="action_view_patient_procedures" groups="acs_hms.group_hms_receptionist" class="oe_stat_button" icon="fa-medkit" type="object">
+                        <button name="action_view_patient_procedures" groups="acs_hms.group_hms_receptionist,base.group_system,acs_hms.group_hms_doctor,acs_hms.group_hms_nurse" class="oe_stat_button" icon="fa-medkit" type="object">
                             <field string="Procedures" name="patient_procedure_count" widget="statinfo"/>
                         </button>
                         <field name="prescription_ids" invisible="1"/>

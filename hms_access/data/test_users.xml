@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- 1. Receptionist
+             group_hms_receptionist implies base.group_user automatically. -->
+        <record id="user_hms_receptionist" model="res.users">
+            <field name="name">Sarah Johnson</field>
+            <field name="login">receptionist@hms.demo</field>
+            <field name="password">hms@1234</field>
+            <field name="group_ids" eval="[(4, ref('acs_hms.group_hms_receptionist'))]"/>
+        </record>
+
+        <!-- 2. Doctor — created via hms.physician (uses _inherits: res.users).
+             WARNING: physician.create() calls acs_make_dr_portal_user() which resets
+             group_ids to only base.group_user. post_init_hook re-adds group_hms_doctor
+             after all data is loaded. -->
+        <record id="physician_hms_doctor" model="hms.physician">
+            <field name="name">Dr. Ahmed Khan</field>
+            <field name="login">doctor@hms.demo</field>
+            <field name="password">hms@1234</field>
+        </record>
+
+        <!-- 3. Nurse
+             group_hms_nurse implies base.group_user automatically. -->
+        <record id="user_hms_nurse" model="res.users">
+            <field name="name">Emily Rodriguez</field>
+            <field name="login">nurse@hms.demo</field>
+            <field name="password">hms@1234</field>
+            <field name="group_ids" eval="[(4, ref('acs_hms.group_hms_nurse'))]"/>
+        </record>
+
+        <!-- 4. Lab Technician
+             group_hms_lab_user has NO implied groups — base.group_user must be
+             added explicitly or the user lands on the portal instead of backend. -->
+        <record id="user_hms_lab_tech" model="res.users">
+            <field name="name">Michael Chen</field>
+            <field name="login">labtech@hms.demo</field>
+            <field name="password">hms@1234</field>
+            <field name="group_ids" eval="[
+                (4, ref('base.group_user')),
+                (4, ref('acs_laboratory.group_hms_lab_user')),
+            ]"/>
+        </record>
+
+        <!-- 5. Lab Sample Collector
+             group_hms_lab_sample_user implies group_hms_user but NOT base.group_user,
+             so base.group_user must be added explicitly. -->
+        <record id="user_hms_lab_collector" model="res.users">
+            <field name="name">James Wilson</field>
+            <field name="login">labcollector@hms.demo</field>
+            <field name="password">hms@1234</field>
+            <field name="group_ids" eval="[
+                (4, ref('base.group_user')),
+                (4, ref('acs_laboratory.group_hms_lab_sample_user')),
+            ]"/>
+        </record>
+
+    </data>
+</odoo>

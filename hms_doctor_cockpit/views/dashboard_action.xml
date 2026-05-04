@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_doctor_dashboard" model="ir.actions.client">
+        <field name="name">Doctor's Desk</field>
+        <field name="tag">hms_doctor_cockpit.doctor_dashboard</field>
+    </record>
+
+</odoo>

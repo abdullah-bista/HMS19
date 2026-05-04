@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+portal_hms_appointment_read,Portal Appointment Read,acs_hms.model_hms_appointment,base.group_portal,1,0,1,0
+portal_hms_treatment_read,Portal Treatment Read,acs_hms.model_hms_treatment,base.group_portal,1,0,0,0
+portal_prescription_order_read,Portal Prescription Read,acs_hms.model_prescription_order,base.group_portal,1,0,0,0
+portal_prescription_line_read,Portal Prescription Line Read,acs_hms.model_prescription_line,base.group_portal,1,0,0,0
+portal_acs_patient_evaluation_read,Portal Evaluation Read,acs_hms.model_acs_patient_evaluation,base.group_portal,1,0,0,0
+portal_hms_physician_read,Portal Physician Read,acs_hms_base.model_hms_physician,base.group_portal,1,0,0,0
+portal_hms_grant_portal_access,Grant Portal Access Wizard,hms_patient_portal.model_hms_grant_portal_access,acs_hms_base.group_hms_manager,1,1,1,1

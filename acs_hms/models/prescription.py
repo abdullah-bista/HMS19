@@ -228,7 +228,7 @@ class ACSPrescriptionLine(models.Model):
     common_dosage_id = fields.Many2one('medicament.dosage', ondelete="cascade", string='Dosage/Frequency', help='Drug form, such as tablet or gel')
     short_comment = fields.Char(string='Comment', help='Short comment on the specific drug')
     appointment_id = fields.Many2one('hms.appointment', ondelete="restrict", string='Appointment')
-    treatment_id = fields.Many2one('hms.treatment', related='prescription_id.treatment_id', string='Treatment', store=True)
+    treatment_id = fields.Many2one('hms.treatment', string='Treatment', store=True)
     company_id = fields.Many2one('res.company', ondelete="cascade", string='Hospital', related='prescription_id.company_id')
     qty_available = fields.Float(related='product_id.qty_available', string='Available Qty')
     days = fields.Float("Days",default=1.0)

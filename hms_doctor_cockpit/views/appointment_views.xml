@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- My Appointments: filtered to current physician, default today -->
+    <record id="action_my_appointments" model="ir.actions.act_window">
+        <field name="name">My Appointments</field>
+        <field name="res_model">hms.appointment</field>
+        <field name="view_mode">kanban,list,form,calendar</field>
+        <field name="domain">[('physician_id.user_id', '=', uid)]</field>
+        <field name="context">{'search_default_today': 1}</field>
+        <field name="search_view_id" ref="acs_hms.view_hms_appointment_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No appointments found for today.</p>
+            <p>Your scheduled appointments will appear here.</p>
+        </field>
+    </record>
+
+</odoo>

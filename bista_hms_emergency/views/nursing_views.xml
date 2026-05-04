@@ -12,10 +12,13 @@
             <form>
                 <header>
                     <button name="action_start_shift" string="Start Shift" type="object"
+                        groups="base.group_system,bista_hms_emergency.group_nursing_user"
                         invisible="state != 'draft'" class="btn-primary"/>
                     <button name="action_complete_shift" string="Complete Shift" type="object"
+                        groups="base.group_system,bista_hms_emergency.group_nursing_user"
                         invisible="state != 'in_progress'" class="btn-primary"/>
                     <button name="action_review" string="Mark Reviewed" type="object"
+                        groups="base.group_system,acs_hms.group_hms_doctor"
                         invisible="state != 'completed'"/>
                     <field name="state" widget="statusbar"
                         statusbar_visible="draft,in_progress,completed,reviewed"/>

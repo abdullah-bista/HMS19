@@ -147,6 +147,10 @@ class ACSTreatment(models.Model):
                 vals['name'] = self.env['ir.sequence'].with_company(vals.get('company_id')).next_by_code('hms.treatment', sequence_date=seq_date) or _("New")
         return super().create(vals_list)
 
+    def write(self, values):
+        res = super(ACSTreatment, self).write(values)
+        return res
+
     def unlink(self):
         for data in self:
             if data.state in ['done']:
@@ -249,4 +253,3 @@ class ACSTreatment(models.Model):
         else:
             raise UserError(_("Something went wrong! Please Open Appointment and try again"))
 
-    

@@ -12,22 +12,30 @@
             <form>
                 <header>
                     <button name="action_create_invoice" string="Create Invoice" type="object"
+                        groups="bista_hms_emergency.group_reception_user,base.group_system"
                         invisible="state != 'arrived' or invoice_id != False"
                         class="btn-warning"/>
                     <button name="action_triage" string="Start Triage" type="object"
+                        groups="bista_hms_emergency.group_nursing_user,base.group_system"
                         invisible="state != 'arrived'" class="btn-primary"/>
                     <button name="action_start_treatment" string="Start Treatment" type="object"
+                        groups="acs_hms.group_hms_doctor,base.group_system"
                         invisible="state != 'triage'" class="btn-primary"/>
                     <button name="action_observe" string="Move to Observation" type="object"
+                        groups="acs_hms.group_hms_doctor,base.group_system"
                         invisible="state != 'treatment'"/>
                     <button name="action_admit" string="Admit to IPD" type="object"
+                        groups="bista_hms_emergency.group_nursing_user,bista_hms_emergency.group_emergency_manager,base.group_system"
                         invisible="state not in ('treatment', 'observation')"
                         class="btn-success"/>
                     <button name="action_discharge" string="Discharge" type="object"
+                        groups="acs_hms.group_hms_doctor,bista_hms_emergency.group_emergency_manager,base.group_system"
                         invisible="state not in ('treatment', 'observation')"/>
                     <button name="action_transfer" string="Transfer" type="object"
+                        groups="acs_hms.group_hms_doctor,bista_hms_emergency.group_emergency_manager,base.group_system"
                         invisible="state not in ('treatment', 'observation')"/>
                     <button name="action_deceased" string="Mark Deceased" type="object"
+                        groups="acs_hms.group_hms_doctor,bista_hms_emergency.group_emergency_manager,base.group_system"
                         invisible="state not in ('treatment', 'observation')"
                         confirm="Are you sure you want to mark this patient as deceased in the ER?"/>
                     <field name="invoice_id" invisible="1"/>
@@ -38,6 +46,7 @@
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_invoice" type="object"
                             class="oe_stat_button" icon="fa-file-text-o"
+                            groups="base.group_system,bista_hms_emergency.group_reception_user,bista_hms_emergency.group_emergency_manager"
                             invisible="invoice_id == False">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">Registration</span>
@@ -45,6 +54,7 @@
                             </div>
                         </button>
                         <button name="action_view_treatments" type="object"
+                            groups="base.group_system,bista_hms_emergency.group_emergency_manager,acs_hms.group_hms_doctor,bista_hms_emergency.group_nursing_user"
                             class="oe_stat_button" icon="fa-heartbeat">
                             <div class="o_stat_info">
                                 <field name="treatment_count" class="o_stat_value"/>
@@ -52,6 +62,7 @@
                             </div>
                         </button>
                         <button name="action_view_lab_requests" type="object"
+                            groups="base.group_system,bista_hms_emergency.group_emergency_manager,acs_hms.group_hms_doctor,bista_hms_emergency.group_nursing_user"
                             class="oe_stat_button" icon="fa-flask">
                             <div class="o_stat_info">
                                 <field name="lab_request_count" class="o_stat_value"/>
@@ -59,6 +70,7 @@
                             </div>
                         </button>
                         <button name="action_view_prescriptions" type="object"
+                            groups="base.group_system,bista_hms_emergency.group_emergency_manager,acs_hms.group_hms_doctor,bista_hms_emergency.group_nursing_user"
                             class="oe_stat_button" icon="fa-medkit">
                             <div class="o_stat_info">
                                 <field name="prescription_count" class="o_stat_value"/>
@@ -66,6 +78,7 @@
                             </div>
                         </button>
                         <button name="action_view_procedures" type="object"
+                            groups="base.group_system,bista_hms_emergency.group_emergency_manager,acs_hms.group_hms_doctor,bista_hms_emergency.group_nursing_user"
                             class="oe_stat_button" icon="fa-stethoscope">
                             <div class="o_stat_info">
                                 <field name="procedure_count" class="o_stat_value"/>
@@ -73,6 +86,7 @@
                             </div>
                         </button>
                         <button name="action_view_ot_bookings" type="object"
+                            groups="base.group_system,bista_hms_emergency.group_emergency_manager,acs_hms.group_hms_doctor,bista_hms_emergency.group_nursing_user"
                             class="oe_stat_button" icon="fa-hospital-o">
                             <div class="o_stat_info">
                                 <field name="ot_booking_count" class="o_stat_value"/>
@@ -80,6 +94,7 @@
                             </div>
                         </button>
                         <button name="action_view_nursing_sheets" type="object"
+                            groups="base.group_system,bista_hms_emergency.group_emergency_manager,acs_hms.group_hms_doctor,bista_hms_emergency.group_nursing_user"
                             class="oe_stat_button" icon="fa-clipboard">
                             <div class="o_stat_info">
                                 <field name="nursing_sheet_count" class="o_stat_value"/>
@@ -183,7 +198,7 @@
                         <field name="disposition_datetime"/>
                     </group>
 
-                    <notebook>
+                    <notebook groups="base.group_system,bista_hms_emergency.group_nursing_user,bista_hms_emergency.group_emergency_user,acs_hms.group_hms_doctor">
                         <page string="Treatments" name="treatments">
                             <field name="treatment_ids"
                                 context="{

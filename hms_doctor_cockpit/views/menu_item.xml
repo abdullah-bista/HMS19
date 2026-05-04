@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Root menu: Doctor's Desk — only visible to Doctors and above (group_hms_doctor) -->
+    <menuitem id="menu_doctor_desk"
+              name="Doctor's Desk"
+              groups="acs_hms.group_hms_doctor"
+              sequence="5"/>
+
+    <!-- Sub-menus in clinical priority order -->
+    <menuitem id="menu_doctor_dashboard"
+              name="Dashboard"
+              action="action_doctor_dashboard"
+              parent="menu_doctor_desk"
+              sequence="1"/>
+
+    <menuitem id="menu_my_appointments"
+              name="My Appointments"
+              action="action_my_appointments"
+              parent="menu_doctor_desk"
+              sequence="2"/>
+
+    <menuitem id="menu_my_patients"
+              name="My Patients"
+              action="action_my_patients"
+              parent="menu_doctor_desk"
+              sequence="3"/>
+
+    <menuitem id="menu_my_admissions"
+              name="My Admissions"
+              action="hms_doctor_cockpit.action_my_admissions"
+              parent="menu_doctor_desk"
+              sequence="4"/>
+
+    <menuitem id="menu_my_prescriptions"
+              name="My Prescriptions"
+              action="action_my_prescriptions"
+              parent="menu_doctor_desk"
+              sequence="5"/>
+
+    <menuitem id="menu_my_lab_requests"
+              name="My Lab Requests"
+              action="action_my_lab_requests"
+              parent="menu_doctor_desk"
+              sequence="6"/>
+
+    <menuitem id="menu_my_procedures"
+              name="My Procedures"
+              action="action_my_procedures"
+              parent="menu_doctor_desk"
+              sequence="7"/>
+
+</odoo>

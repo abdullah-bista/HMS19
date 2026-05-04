@@ -10,7 +10,7 @@
           <button name="button_requested" invisible="state!='draft'" string="Submit Request"
             class="oe_highlight" type="object" />
           <button name="button_accept" invisible="state!='requested'" string="Accept" type="object"
-            class="oe_highlight" groups="acs_laboratory.group_hms_lab_user" />
+            class="oe_highlight" groups="acs_laboratory.group_hms_lab_sample_user,acs_laboratory.group_hms_lab_sample_user"/>
           <button name="button_in_progress" invisible="state!='accepted'" string="In Progress"
             class="oe_highlight" type="object" groups="acs_laboratory.group_hms_lab_user" />
           <button name="button_done" invisible="state!='in_progress'" string="Done"
@@ -33,10 +33,10 @@
               <field string="Invoices" name="invoice_count" widget="statinfo" />
             </button>
             <button name="action_view_test_results" string="Test Results" class="oe_stat_button"
-              icon="fa-flask" type="object"
+              icon="fa-flask" type="object" groups="acs_laboratory.group_hms_lab_user,base.group_system"
               invisible="state not in ['in_progress','to_invoice','done'] or acs_no_lab_result" />
             <button name="action_view_lab_samples" string="Test Samples" class="oe_stat_button"
-              icon="fa-list" type="object" />
+              icon="fa-list" type="object" groups="acs_laboratory.group_hms_lab_sample_user,base.group_system"/>
           </div>
           <h1>
             <field name="name" class="oe_inline" />

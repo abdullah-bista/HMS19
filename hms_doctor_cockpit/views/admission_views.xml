@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- My Treatments: filtered to current physician, defaults to active (not done/cancelled) -->
+    <record id="action_my_admissions" model="ir.actions.act_window">
+        <field name="name">My Admissions</field>
+        <field name="res_model">hms.admission</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('attending_physician_id.user_id', '=', uid)]</field>
+        <field name="context">{'search_default_done': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No active treatments found.</p>
+            <p>Treatments where you are the primary physician will appear here.</p>
+        </field>
+    </record>
+
+</odoo>

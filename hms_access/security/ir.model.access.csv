@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_grant_portal_receptionist,HMS Grant Portal Access Receptionist,hms_patient_portal.model_hms_grant_portal_access,acs_hms.group_hms_receptionist,1,1,1,1
+access_patient_lab_technician,HMS Patient Lab Technician Read,acs_hms_base.model_hms_patient,acs_laboratory.group_hms_lab_user,1,0,0,0
+access_physician_lab_technician,HMS Physician Lab Technician Read,acs_hms_base.model_hms_physician,acs_laboratory.group_hms_lab_user,1,0,0,0

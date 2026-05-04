@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- My Prescriptions: filtered to current physician -->
+    <record id="action_my_prescriptions" model="ir.actions.act_window">
+        <field name="name">My Prescriptions</field>
+        <field name="res_model">prescription.order</field>
+        <field name="view_mode">list,kanban,form,calendar</field>
+        <field name="domain">[('physician_id.user_id', '=', uid)]</field>
+        <field name="search_view_id" ref="acs_hms.view_hms_prescription_order_search"/>
+        <field name="view_id" ref="acs_hms.view_hms_prescription_order_list"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No prescriptions found.</p>
+            <p>Prescriptions you have issued will appear here.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -77,7 +77,7 @@
                                 </group>
                                 <group>
                                     <button name="get_procedure_group_data" invisible="not procedure_group_id or state in ['cancel','done']" title="Get Procedure Data" type="object" icon="fa-plus"/>
-                                    <button name="action_create_procedure_invoice" class="oe_highlight pull-right" string="Create Combined Invoice" type="object"/>
+                                    <button name="action_create_procedure_invoice" class="oe_highlight pull-right" string="Create Combined Invoice" type="object" groups="base.group_system,acs_hms.group_hms_receptionist"/>
                                 </group>
                             </group>
                             <field name="patient_procedure_ids" context="{'default_treatment_id': id, 'default_patient_id': patient_id, 'default_physician_id': physician_id, 'default_department_id': department_id}" readonly="state in ['cancel','done']">

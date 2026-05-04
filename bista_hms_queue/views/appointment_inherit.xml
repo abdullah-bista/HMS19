@@ -33,7 +33,7 @@
                         type="object"
                         invisible="state != 'waiting'"
                         class="btn-primary"
-                        groups="acs_hms.group_hms_receptionist,acs_hms.group_hms_nurse"/>
+                        groups="base.group_system,acs_hms.group_hms_nurse"/>
             </xpath>
 
         </field>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+<t t-name="hms_doctor_cockpit.DoctorDashboard">
+    <div class="o_doctor_dashboard p-4">
+
+        <!-- Loading spinner -->
+        <t t-if="state.loading">
+            <div class="d-flex justify-content-center align-items-center" style="min-height: 300px;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </t>
+
+        <!-- No physician record linked to this user -->
+        <t t-elif="state.noPhysicianRecord">
+            <div class="alert alert-warning mt-4">
+                <strong>No physician record found.</strong>
+                Your user account is not linked to a physician profile. Please ask your administrator
+                to set the <em>User</em> field on your physician record.
+            </div>
+        </t>
+
+        <!-- Main dashboard content -->
+        <t t-else="">
+
+            <!-- Header -->
+            <div class="o_dashboard_header d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h3 class="mb-0 fw-bold">Doctor's Desk</h3>
+                    <span class="text-muted">Dr. <t t-esc="state.physicianName"/></span>
+                </div>
+                <span class="text-muted small" t-esc="todayDateString"/>
+            </div>
+
+            <!-- Stat cards row -->
+            <div class="row g-3 mb-4">
+
+                <!-- Today's Appointments -->
+                <div class="col-xl col-md-4 col-sm-6">
+                    <div class="card o_stat_card o_stat_appointments h-100"
+                         t-on-click="() => this.openAction('hms_doctor_cockpit.action_my_appointments')">
+                        <div class="card-body text-center py-4">
+                            <div class="o_stat_count text-primary" t-esc="state.stats.todayAppts"/>
+                            <div class="o_stat_label mt-1">Today's Appointments</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Waiting Patients -->
+                <div class="col-xl col-md-4 col-sm-6">
+                    <div class="card o_stat_card o_stat_waiting h-100"
+                         t-on-click="() => this.openAction('hms_doctor_cockpit.action_my_appointments')">
+                        <div class="card-body text-center py-4">
+                            <div class="o_stat_count text-warning" t-esc="state.stats.waitingPatients"/>
+                            <div class="o_stat_label mt-1">Waiting Now</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Treatments -->
+                <div class="col-xl col-md-4 col-sm-6">
+                    <div class="card o_stat_card o_stat_treatments h-100"
+                         t-on-click="() => this.openAction('hms_doctor_cockpit.action_my_admissions')">
+                        <div class="card-body text-center py-4">
+                            <div class="o_stat_count text-success" t-esc="state.stats.activeTreatments"/>
+                            <div class="o_stat_label mt-1">Admitted Patients</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Prescriptions -->
+                <div class="col-xl col-md-4 col-sm-6">
+                    <div class="card o_stat_card o_stat_prescriptions h-100"
+                         t-on-click="() => this.openAction('hms_doctor_cockpit.action_my_prescriptions')">
+                        <div class="card-body text-center py-4">
+                            <div class="o_stat_count text-info" t-esc="state.stats.draftPrescriptions"/>
+                            <div class="o_stat_label mt-1">Pending Prescriptions</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lab Results Ready -->
+                <div class="col-xl col-md-4 col-sm-6">
+                    <div class="card o_stat_card o_stat_lab h-100"
+                         t-on-click="() => this.openAction('hms_doctor_cockpit.action_my_lab_requests')">
+                        <div class="card-body text-center py-4">
+                            <div class="o_stat_count text-danger" t-esc="state.stats.labResultsReady"/>
+                            <div class="o_stat_label mt-1">Lab Results Ready</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Today's Appointment Queue -->
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0">Today's Queue</h5>
+                    <button class="btn btn-sm btn-outline-primary"
+                            t-on-click="() => this.openAction('hms_doctor_cockpit.action_my_appointments')">
+                        View All
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <t t-if="state.todayQueue.length === 0">
+                        <div class="p-4 text-center text-muted">
+                            No pending appointments for today.
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Patient</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                        <th>Chief Complaint</th>
+                                        <th class="text-end"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="state.todayQueue" t-as="appt" t-key="appt.id">
+                                        <td class="fw-semibold" t-esc="appt.patient_id[1]"/>
+                                        <td t-esc="this.formatTime(appt.date)"/>
+                                        <td>
+                                            <span class="badge"
+                                                  t-att-class="this.stateBadgeClass(appt.state)"
+                                                  t-esc="this.stateLabel(appt.state)"/>
+                                        </td>
+                                        <td class="text-muted small">
+                                            <t t-esc="appt.chief_complain || '—'"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                    t-on-click="() => this.openAppointment(appt.id)">
+                                                Open
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+        </t>
+    </div>
+</t>
+
+</templates>

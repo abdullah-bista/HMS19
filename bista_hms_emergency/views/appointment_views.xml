@@ -15,7 +15,7 @@
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_lab_requests" type="object"
                         class="oe_stat_button" icon="fa-flask"
-                        groups="acs_laboratory.group_hms_lab_user">
+                        groups="acs_laboratory.group_hms_lab_user,acs_hms.group_hms_doctor,acs_hms.group_hms_nurse,base.group_system">
                     <div class="o_stat_info">
                         <span class="o_stat_value">
                             <field name="lab_request_count"/>
@@ -45,12 +45,13 @@
                         type="object"
                         invisible="state not in ('in_consultation')"
                         class="btn-secondary"
-                        groups="acs_laboratory.group_hms_lab_user"/>
+                        groups="acs_hms.group_hms_doctor,base.group_system"/>
                 <button name="action_admit_to_ipd"
                         string="Admit To IPD"
                         type="object"
                         invisible="state != 'in_consultation' or has_ongoing_admission"
-                        class="btn-success"/>
+                        class="btn-success"
+                        groups="base.group_system,acs_hms.group_hms_doctor"/>
             </xpath>
 
         </field>

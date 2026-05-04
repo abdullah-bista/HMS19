@@ -15,12 +15,15 @@
                         class="btn-primary"
                         invisible="state != 'draft'"/>
                     <button name="action_billing_cleared" string="Mark Billing Cleared" type="object"
+                            groups="base.group_system,bista_hms_emergency.group_ipd_manager"
                         class="btn-primary"
                         invisible="state != 'pending_payment'"/>
                     <button name="action_approve" string="Approve Discharge" type="object"
+                        groups="base.group_system,bista_hms_emergency.group_ipd_manager"
                         class="btn-primary"
                         invisible="state != 'pending_approval'"/>
                     <button name="action_complete" string="Complete / Release Patient" type="object"
+                        groups="base.group_system,bista_hms_emergency.group_ipd_manager"
                         class="btn-primary"
                         invisible="state != 'approved'"/>
                     <field name="state" widget="statusbar"

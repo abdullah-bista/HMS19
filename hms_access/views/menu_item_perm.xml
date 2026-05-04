@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="acs_laboratory.menu_laboratory" model="ir.ui.menu">
+        <field name="group_ids" eval="[
+            Command.link(ref('base.group_system')),
+            Command.link(ref('bista_hms_emergency.group_reception_user')),
+        ]"/>
+    </record>
+
+    <record id="acs_laboratory.menu_lab_request" model="ir.ui.menu">
+        <field name="group_ids" eval="[
+            Command.link(ref('base.group_system')),
+            Command.link(ref('acs_laboratory.group_hms_lab_user')),
+            Command.link(ref('bista_hms_emergency.group_reception_user')),
+        ]"/>
+    </record>
+</odoo>

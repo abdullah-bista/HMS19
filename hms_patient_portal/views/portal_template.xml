@@ -1,0 +1,860 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================== -->
+    <!-- BREADCRUMBS                                                         -->
+    <!-- ================================================================== -->
+    <template id="portal_breadcrumbs_hms_patient" inherit_id="portal.portal_breadcrumbs" priority="30">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+
+            <!-- Appointments -->
+            <li t-if="page_name == 'appointment' or appointment or page_name == 'appointment_new'"
+                t-attf-class="breadcrumb-item #{'active' if not appointment else ''}">
+                <a t-if="appointment" t-attf-href="/my/appointments?{{ keep_query() }}">Appointments</a>
+                <t t-elif="page_name == 'appointment_new'">
+                    <a href="/my/appointments">Appointments</a>
+                </t>
+                <t t-else="">Appointments</t>
+            </li>
+            <li t-if="appointment" class="breadcrumb-item active">
+                <t t-esc="appointment.name"/>
+            </li>
+            <li t-if="page_name == 'appointment_new'" class="breadcrumb-item active">
+                Request Appointment
+            </li>
+
+            <!-- Prescriptions -->
+            <li t-if="page_name == 'prescription' or prescription"
+                t-attf-class="breadcrumb-item #{'active' if not prescription else ''}">
+                <a t-if="prescription" t-attf-href="/my/prescriptions?{{ keep_query() }}">Prescriptions</a>
+                <t t-else="">Prescriptions</t>
+            </li>
+            <li t-if="prescription" class="breadcrumb-item active">
+                <t t-esc="prescription.name"/>
+            </li>
+
+            <!-- Treatments -->
+            <li t-if="page_name == 'treatment' or treatment"
+                t-attf-class="breadcrumb-item #{'active' if not treatment else ''}">
+                <a t-if="treatment" t-attf-href="/my/treatments?{{ keep_query() }}">Treatments</a>
+                <t t-else="">Treatments</t>
+            </li>
+            <li t-if="treatment" class="breadcrumb-item active">
+                <t t-esc="treatment.name"/>
+            </li>
+
+            <!-- Health Summary -->
+            <li t-if="page_name == 'health_summary'" class="breadcrumb-item active">
+                Health Summary
+            </li>
+
+        </xpath>
+    </template>
+
+    <!-- ================================================================== -->
+    <!-- PORTAL HOME DASHBOARD                                               -->
+    <!-- ================================================================== -->
+    <template id="portal_my_home_hms_patient" name="HMS Patient Portal - My Health"
+              inherit_id="portal.portal_my_home" priority="35" customize_show="True">
+        <div id="portal_client_category" position="after">
+            <div class="o_portal_category row g-2 mt-3" id="portal_hms_patient_category">
+                <t t-call="portal.portal_docs_entry">
+                    <t t-set="title">Appointments</t>
+                    <t t-set="url" t-value="'/my/appointments'"/>
+                    <t t-set="text">View your appointment history and request a new appointment</t>
+                    <t t-set="placeholder_count" t-value="'appointment_count'"/>
+                </t>
+                <t t-call="portal.portal_docs_entry">
+                    <t t-set="title">Prescriptions</t>
+                    <t t-set="url" t-value="'/my/prescriptions'"/>
+                    <t t-set="text">Review your prescriptions and medicines</t>
+                    <t t-set="placeholder_count" t-value="'prescription_count'"/>
+                </t>
+                <t t-call="portal.portal_docs_entry">
+                    <t t-set="title">Treatments</t>
+                    <t t-set="url" t-value="'/my/treatments'"/>
+                    <t t-set="text">View your treatment history and diagnosis records</t>
+                    <t t-set="placeholder_count" t-value="'treatment_count'"/>
+                </t>
+                <t t-call="portal.portal_docs_entry">
+                    <t t-set="title">Health Summary</t>
+                    <t t-set="url" t-value="'/my/health_summary'"/>
+                    <t t-set="text">Your latest vitals and health data</t>
+                </t>
+            </div>
+        </div>
+    </template>
+
+    <!-- ================================================================== -->
+    <!-- APPOINTMENT LIST                                                    -->
+    <!-- ================================================================== -->
+    <template id="portal_my_appointments" name="My Appointments">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Appointments</t>
+            </t>
+
+            <div class="mb-3">
+                <a href="/my/appointments/new" class="btn btn-primary">
+                    Request New Appointment
+                </a>
+            </div>
+
+            <t t-if="not appointments">
+                <p>There are currently no appointments for your account.</p>
+            </t>
+
+            <div t-if="appointments" class="panel panel-default">
+                <div class="table-responsive">
+                    <table class="table table-hover bg-white status_table o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Reference</th>
+                                <th>Date</th>
+                                <th>Physician</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="appointments" t-as="appt">
+                                <tr>
+                                    <td>
+                                        <a t-attf-href="/my/appointments/#{appt.id}?{{ keep_query() }}">
+                                            <t t-esc="appt.name"/>
+                                        </a>
+                                    </td>
+                                    <td><span t-field="appt.date"/></td>
+                                    <td><span t-field="appt.physician_id.name"/></td>
+                                    <td><span t-field="appt.department_id.name"/></td>
+                                    <td class="tx_status">
+                                        <t t-if="appt.state == 'draft'">
+                                            <span class="badge rounded-pill text-bg-secondary">Draft</span>
+                                        </t>
+                                        <t t-elif="appt.state == 'confirm'">
+                                            <span class="badge rounded-pill text-bg-info">Confirmed</span>
+                                        </t>
+                                        <t t-elif="appt.state == 'done'">
+                                            <span class="badge rounded-pill text-bg-success">Done</span>
+                                        </t>
+                                        <t t-elif="appt.state == 'cancel'">
+                                            <span class="badge rounded-pill text-bg-danger">Cancelled</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="badge rounded-pill text-bg-warning">
+                                                <t t-esc="appt.state"/>
+                                            </span>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div t-if="pager" class="o_portal_pager text-center">
+                <t t-call="portal.pager"/>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================== -->
+    <!-- APPOINTMENT DETAIL                                                  -->
+    <!-- ================================================================== -->
+    <template id="portal_appointment_detail" name="Appointment Detail">
+        <t t-call="portal.portal_layout">
+            <div id="appointment_content" class="col-12 col-lg mt-4">
+
+                <!-- Header -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Appointment <t t-esc="appointment.name"/></h4>
+                        <t t-if="appointment.state == 'draft'">
+                            <span class="badge rounded-pill text-bg-secondary">Draft</span>
+                        </t>
+                        <t t-elif="appointment.state == 'confirm'">
+                            <span class="badge rounded-pill text-bg-info">Confirmed</span>
+                        </t>
+                        <t t-elif="appointment.state == 'done'">
+                            <span class="badge rounded-pill text-bg-success">Done</span>
+                        </t>
+                        <t t-elif="appointment.state == 'cancel'">
+                            <span class="badge rounded-pill text-bg-danger">Cancelled</span>
+                        </t>
+                        <t t-else="">
+                            <span class="badge rounded-pill text-bg-warning"><t t-esc="appointment.state"/></span>
+                        </t>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-5">Date</dt>
+                                    <dd class="col-sm-7"><span t-field="appointment.date"/></dd>
+                                    <dt class="col-sm-5">Physician</dt>
+                                    <dd class="col-sm-7"><span t-field="appointment.physician_id.name"/></dd>
+                                    <dt class="col-sm-5">Department</dt>
+                                    <dd class="col-sm-7"><span t-field="appointment.department_id.name"/></dd>
+                                    <t t-if="appointment.follow_date">
+                                        <dt class="col-sm-5">Follow-up Date</dt>
+                                        <dd class="col-sm-7"><span t-field="appointment.follow_date"/></dd>
+                                    </t>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <t t-if="appointment.chief_complain">
+                                    <h6>Chief Complaint</h6>
+                                    <p t-field="appointment.chief_complain" class="text-muted"/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vitals -->
+                <t t-if="appointment.evaluation_ids">
+                    <div class="card mb-4">
+                        <div class="card-header"><h5 class="mb-0">Vitals</h5></div>
+                        <div class="card-body">
+                            <t t-set="eval" t-value="appointment.evaluation_ids[0]"/>
+                            <div class="row text-center">
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <div class="h5 mb-0"><t t-esc="eval.weight or '-'"/> <small>kg</small></div>
+                                        <small class="text-muted">Weight</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <div class="h5 mb-0"><t t-esc="eval.height or '-'"/> <small>cm</small></div>
+                                        <small class="text-muted">Height</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <div class="h5 mb-0"><t t-esc="eval.temp or '-'"/> <small>°C</small></div>
+                                        <small class="text-muted">Temperature</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <div class="h5 mb-0"><t t-esc="eval.hr or '-'"/></div>
+                                        <small class="text-muted">Heart Rate (bpm)</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <div class="h5 mb-0">
+                                            <t t-esc="eval.systolic_bp or '-'"/>/<t t-esc="eval.diastolic_bp or '-'"/>
+                                            <small>mmHg</small>
+                                        </div>
+                                        <small class="text-muted">Blood Pressure</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <div class="h5 mb-0"><t t-esc="eval.spo2 or '-'"/> <small>%</small></div>
+                                        <small class="text-muted">SpO2</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <div class="h5 mb-0"><t t-esc="eval.rbs or '-'"/> <small>mg/dl</small></div>
+                                        <small class="text-muted">Blood Sugar</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <div class="h5 mb-0"><t t-esc="eval.bmi or '-'"/></div>
+                                        <small class="text-muted">BMI</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- Chatter / Secure Messaging -->
+                <div id="appointment_communication" class="mt-4">
+                    <h5>Messages</h5>
+                    <t t-call="portal.message_thread">
+                        <t t-set="object" t-value="appointment"/>
+                    </t>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================== -->
+    <!-- NEW APPOINTMENT REQUEST FORM                                        -->
+    <!-- ================================================================== -->
+    <template id="portal_appointment_request_form" name="Request Appointment">
+        <t t-call="portal.portal_layout">
+            <div class="col-12 col-lg mt-4">
+                <div class="card">
+                    <div class="card-header"><h4 class="mb-0">Request a New Appointment</h4></div>
+                    <div class="card-body">
+                        <form action="/my/appointments/new" method="post" class="o_portal_details">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="date" class="form-label fw-bold">Preferred Date &amp; Time</label>
+                                    <input type="datetime-local" name="date" id="date"
+                                           class="form-control" required="required"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="physician_id" class="form-label fw-bold">Preferred Physician</label>
+                                    <select name="physician_id" id="physician_id" class="form-select">
+                                        <option value="">-- Select Physician --</option>
+                                        <t t-foreach="physicians" t-as="physician">
+                                            <option t-att-value="physician.id">
+                                                <t t-esc="physician.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="department_id" class="form-label fw-bold">Department</label>
+                                    <select name="department_id" id="department_id" class="form-select">
+                                        <option value="">-- Select Department --</option>
+                                        <t t-foreach="departments" t-as="department">
+                                            <option t-att-value="department.id">
+                                                <t t-esc="department.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label for="notes" class="form-label fw-bold">Chief Complaint / Reason for Visit</label>
+                                    <textarea name="notes" id="notes" class="form-control" rows="4"
+                                              placeholder="Briefly describe your symptoms or reason for the appointment..."/>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Submit Request</button>
+                                <a href="/my/appointments" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================== -->
+    <!-- PRESCRIPTION LIST                                                   -->
+    <!-- ================================================================== -->
+    <template id="portal_my_prescriptions" name="My Prescriptions">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Prescriptions</t>
+            </t>
+
+            <t t-if="not prescriptions">
+                <p>There are currently no prescriptions for your account.</p>
+            </t>
+
+            <div t-if="prescriptions" class="panel panel-default">
+                <div class="table-responsive">
+                    <table class="table table-hover bg-white status_table o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Reference</th>
+                                <th>Date</th>
+                                <th>Physician</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="prescriptions" t-as="rx">
+                                <tr>
+                                    <td>
+                                        <a t-attf-href="/my/prescriptions/#{rx.id}?{{ keep_query() }}">
+                                            <t t-esc="rx.name"/>
+                                        </a>
+                                    </td>
+                                    <td><span t-field="rx.prescription_date"/></td>
+                                    <td><span t-field="rx.physician_id.name"/></td>
+                                    <td>
+                                        <t t-if="rx.state == 'draft'">
+                                            <span class="badge rounded-pill text-bg-secondary">Draft</span>
+                                        </t>
+                                        <t t-elif="rx.state == 'prescription'">
+                                            <span class="badge rounded-pill text-bg-success">Prescribed</span>
+                                        </t>
+                                        <t t-elif="rx.state == 'canceled'">
+                                            <span class="badge rounded-pill text-bg-danger">Cancelled</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="badge rounded-pill text-bg-secondary">
+                                                <t t-esc="rx.state"/>
+                                            </span>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div t-if="pager" class="o_portal_pager text-center">
+                <t t-call="portal.pager"/>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================== -->
+    <!-- PRESCRIPTION DETAIL                                                 -->
+    <!-- ================================================================== -->
+    <template id="portal_my_prescription_detail" name="Prescription Detail">
+        <t t-call="portal.portal_layout">
+            <div id="prescription_content" class="col-12 col-lg mt-4">
+
+                <!-- Header -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Prescription <t t-esc="prescription.name"/></h4>
+                        <t t-if="prescription.state == 'prescription'">
+                            <span class="badge rounded-pill text-bg-success">Prescribed</span>
+                        </t>
+                        <t t-elif="prescription.state == 'draft'">
+                            <span class="badge rounded-pill text-bg-secondary">Draft</span>
+                        </t>
+                        <t t-else="">
+                            <span class="badge rounded-pill text-bg-danger">Cancelled</span>
+                        </t>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-3">Date</dt>
+                            <dd class="col-sm-9"><span t-field="prescription.prescription_date"/></dd>
+                            <dt class="col-sm-3">Physician</dt>
+                            <dd class="col-sm-9"><span t-field="prescription.physician_id.name"/></dd>
+                            <t t-if="prescription.diseases_ids">
+                                <dt class="col-sm-3">Diagnosis</dt>
+                                <dd class="col-sm-9">
+                                    <t t-foreach="prescription.diseases_ids" t-as="disease">
+                                        <span class="badge text-bg-light border me-1">
+                                            <t t-esc="disease.name"/>
+                                        </span>
+                                    </t>
+                                </dd>
+                            </t>
+                            <t t-if="prescription.pregnancy_warning">
+                                <dt class="col-sm-3"></dt>
+                                <dd class="col-sm-9">
+                                    <span class="badge text-bg-warning">Pregnancy Warning</span>
+                                </dd>
+                            </t>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Medicines -->
+                <div class="card mb-4">
+                    <div class="card-header"><h5 class="mb-0">Medicines</h5></div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Medicine</th>
+                                        <th>Dose</th>
+                                        <th>Qty/Day</th>
+                                        <th>Days</th>
+                                        <th>Form</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="prescription.prescription_line_ids" t-as="line">
+                                        <tr>
+                                            <td><t t-esc="line.sudo().product_id.name"/></td>
+                                            <td><t t-esc="line.sudo().dose"/></td>
+                                            <td><t t-esc="line.sudo().qty_per_day"/></td>
+                                            <td><t t-esc="line.sudo().days"/></td>
+                                            <td><t t-esc="line.sudo().form_id.name"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <t t-if="prescription.notes">
+                    <div class="card mb-4">
+                        <div class="card-header"><h5 class="mb-0">Notes</h5></div>
+                        <div class="card-body">
+                            <p t-field="prescription.notes" class="mb-0"/>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- QR Code -->
+                <t t-if="prescription.qr_image">
+                    <div class="card mb-4">
+                        <div class="card-header"><h5 class="mb-0">Prescription QR Code</h5></div>
+                        <div class="card-body text-center">
+                            <img t-att-src="'data:image/png;base64,' + prescription.qr_image.decode('utf-8')"
+                                 alt="Prescription QR Code" style="max-width: 200px;"/>
+                            <p class="text-muted mt-2 mb-0 small">
+                                Scan to verify this prescription
+                            </p>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- Chatter -->
+                <div id="prescription_communication" class="mt-4">
+                    <h5>Messages</h5>
+                    <t t-call="portal.message_thread">
+                        <t t-set="object" t-value="prescription"/>
+                    </t>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================== -->
+    <!-- TREATMENT LIST                                                      -->
+    <!-- ================================================================== -->
+    <template id="portal_my_treatments" name="My Treatments">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Treatments</t>
+            </t>
+
+            <t t-if="not treatments">
+                <p>There are currently no treatments for your account.</p>
+            </t>
+
+            <div t-if="treatments" class="panel panel-default">
+                <div class="table-responsive">
+                    <table class="table table-hover bg-white status_table o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Reference</th>
+                                <th>Date</th>
+                                <th>Diagnosis</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="treatments" t-as="trt">
+                                <tr>
+                                    <td>
+                                        <a t-attf-href="/my/treatments/#{trt.id}?{{ keep_query() }}">
+                                            <t t-esc="trt.name"/>
+                                        </a>
+                                    </td>
+                                    <td><span t-field="trt.date"/></td>
+                                    <td><span t-field="trt.diagnosis_id.name"/></td>
+                                    <td>
+                                        <t t-if="trt.disease_severity == 'mild'">
+                                            <span class="badge text-bg-success">Mild</span>
+                                        </t>
+                                        <t t-elif="trt.disease_severity == 'moderate'">
+                                            <span class="badge text-bg-warning">Moderate</span>
+                                        </t>
+                                        <t t-elif="trt.disease_severity == 'severe'">
+                                            <span class="badge text-bg-danger">Severe</span>
+                                        </t>
+                                    </td>
+                                    <td>
+                                        <t t-if="trt.state == 'draft'">
+                                            <span class="badge rounded-pill text-bg-secondary">Draft</span>
+                                        </t>
+                                        <t t-elif="trt.state == 'running'">
+                                            <span class="badge rounded-pill text-bg-warning">Running</span>
+                                        </t>
+                                        <t t-elif="trt.state == 'done'">
+                                            <span class="badge rounded-pill text-bg-success">Completed</span>
+                                        </t>
+                                        <t t-elif="trt.state == 'cancel'">
+                                            <span class="badge rounded-pill text-bg-danger">Cancelled</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div t-if="pager" class="o_portal_pager text-center">
+                <t t-call="portal.pager"/>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================== -->
+    <!-- TREATMENT DETAIL                                                    -->
+    <!-- ================================================================== -->
+    <template id="portal_my_treatment_detail" name="Treatment Detail">
+        <t t-call="portal.portal_layout">
+            <div id="treatment_content" class="col-12 col-lg mt-4">
+
+                <!-- Header -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Treatment <t t-esc="treatment.name"/></h4>
+                        <t t-if="treatment.state == 'draft'">
+                            <span class="badge rounded-pill text-bg-secondary">Draft</span>
+                        </t>
+                        <t t-elif="treatment.state == 'running'">
+                            <span class="badge rounded-pill text-bg-warning">Running</span>
+                        </t>
+                        <t t-elif="treatment.state == 'done'">
+                            <span class="badge rounded-pill text-bg-success">Completed</span>
+                        </t>
+                        <t t-elif="treatment.state == 'cancel'">
+                            <span class="badge rounded-pill text-bg-danger">Cancelled</span>
+                        </t>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-5">Diagnosis Date</dt>
+                                    <dd class="col-sm-7"><span t-field="treatment.date"/></dd>
+                                    <t t-if="treatment.healed_date">
+                                        <dt class="col-sm-5">Healed Date</dt>
+                                        <dd class="col-sm-7"><span t-field="treatment.healed_date"/></dd>
+                                    </t>
+                                    <dt class="col-sm-5">Physician</dt>
+                                    <dd class="col-sm-7"><span t-field="treatment.physician_id.name"/></dd>
+                                    <t t-if="treatment.diagnosis_id">
+                                        <dt class="col-sm-5">Diagnosis</dt>
+                                        <dd class="col-sm-7"><span t-field="treatment.diagnosis_id.name"/></dd>
+                                    </t>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row mb-0">
+                                    <t t-if="treatment.disease_severity">
+                                        <dt class="col-sm-5">Severity</dt>
+                                        <dd class="col-sm-7">
+                                            <t t-if="treatment.disease_severity == 'mild'">
+                                                <span class="badge text-bg-success">Mild</span>
+                                            </t>
+                                            <t t-elif="treatment.disease_severity == 'moderate'">
+                                                <span class="badge text-bg-warning">Moderate</span>
+                                            </t>
+                                            <t t-elif="treatment.disease_severity == 'severe'">
+                                                <span class="badge text-bg-danger">Severe</span>
+                                            </t>
+                                        </dd>
+                                    </t>
+                                    <t t-if="treatment.disease_status">
+                                        <dt class="col-sm-5">Disease Status</dt>
+                                        <dd class="col-sm-7">
+                                            <span class="badge text-bg-info">
+                                                <t t-esc="dict(treatment._fields['disease_status'].selection).get(treatment.disease_status, treatment.disease_status)"/>
+                                            </span>
+                                        </dd>
+                                    </t>
+                                    <t t-if="treatment.is_infectious">
+                                        <dt class="col-sm-5"></dt>
+                                        <dd class="col-sm-7">
+                                            <span class="badge text-bg-danger">Infectious</span>
+                                        </dd>
+                                    </t>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <t t-if="treatment.finding">
+                            <hr/>
+                            <h6>Clinical Findings</h6>
+                            <p t-field="treatment.finding" class="text-muted mb-0"/>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- Chatter -->
+                <div id="treatment_communication" class="mt-4">
+                    <h5>Messages</h5>
+                    <t t-call="portal.message_thread">
+                        <t t-set="object" t-value="treatment"/>
+                    </t>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================== -->
+    <!-- HEALTH SUMMARY                                                      -->
+    <!-- ================================================================== -->
+    <template id="portal_health_summary" name="Health Summary">
+        <t t-call="portal.portal_layout">
+            <div class="col-12 col-lg mt-4">
+                <h3 class="mb-4">Health Summary</h3>
+
+                <t t-if="not latest_eval">
+                    <div class="alert alert-info" role="alert">
+                        No health data is available yet. Your vitals will appear here after your
+                        first completed evaluation.
+                    </div>
+                </t>
+
+                <t t-if="latest_eval">
+                    <p class="text-muted">
+                        Last recorded on <strong><span t-field="latest_eval.date"/></strong>
+                    </p>
+
+                    <!-- Vitals Cards -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-md-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <div class="h4 mb-1">
+                                        <t t-esc="latest_eval.weight or '-'"/>
+                                        <small class="text-muted fs-6">kg</small>
+                                    </div>
+                                    <div class="text-muted small">Weight</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <div class="h4 mb-1">
+                                        <t t-esc="latest_eval.height or '-'"/>
+                                        <small class="text-muted fs-6">cm</small>
+                                    </div>
+                                    <div class="text-muted small">Height</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <div class="h4 mb-1">
+                                        <t t-esc="'%.1f' % latest_eval.bmi if latest_eval.bmi else '-'"/>
+                                    </div>
+                                    <div class="text-muted small">BMI</div>
+                                    <t t-if="latest_eval.bmi_state == 'low_weight'">
+                                        <span class="badge text-bg-warning">Underweight</span>
+                                    </t>
+                                    <t t-elif="latest_eval.bmi_state == 'normal'">
+                                        <span class="badge text-bg-success">Normal</span>
+                                    </t>
+                                    <t t-elif="latest_eval.bmi_state == 'over_weight'">
+                                        <span class="badge text-bg-warning">Overweight</span>
+                                    </t>
+                                    <t t-elif="latest_eval.bmi_state == 'obesity'">
+                                        <span class="badge text-bg-danger">Obese</span>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <div class="h4 mb-1">
+                                        <t t-esc="latest_eval.temp or '-'"/>
+                                        <small class="text-muted fs-6">°C</small>
+                                    </div>
+                                    <div class="text-muted small">Temperature</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <div class="h4 mb-1">
+                                        <t t-esc="latest_eval.hr or '-'"/>
+                                    </div>
+                                    <div class="text-muted small">Heart Rate (bpm)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <div class="h4 mb-1">
+                                        <t t-esc="latest_eval.rr or '-'"/>
+                                    </div>
+                                    <div class="text-muted small">Resp. Rate (bpm)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <div class="h4 mb-1">
+                                        <t t-esc="latest_eval.systolic_bp or '-'"/>/<t t-esc="latest_eval.diastolic_bp or '-'"/>
+                                        <small class="text-muted fs-6">mmHg</small>
+                                    </div>
+                                    <div class="text-muted small">Blood Pressure</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <div class="h4 mb-1">
+                                        <t t-esc="latest_eval.spo2 or '-'"/>
+                                        <small class="text-muted fs-6">%</small>
+                                    </div>
+                                    <div class="text-muted small">SpO2</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <div class="h4 mb-1">
+                                        <t t-esc="latest_eval.rbs or '-'"/>
+                                        <small class="text-muted fs-6">mg/dl</small>
+                                    </div>
+                                    <div class="text-muted small">Blood Sugar (RBS)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <t t-if="latest_eval.pain_level and latest_eval.pain_level != '0'">
+                            <div class="col-6 col-md-3">
+                                <div class="card text-center h-100">
+                                    <div class="card-body">
+                                        <div class="h4 mb-1"><t t-esc="latest_eval.pain_level"/>/10</div>
+                                        <div class="text-muted small">Pain Level</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+
+                <div class="mt-3">
+                    <a href="/my/appointments" class="btn btn-outline-primary">View Appointments</a>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================== -->
+    <!-- PATIENT FORM — Grant Portal Access button                           -->
+    <!-- ================================================================== -->
+    <record id="view_hms_patient_grant_portal_button" model="ir.ui.view">
+        <field name="name">hms.patient.grant.portal.button</field>
+        <field name="model">hms.patient</field>
+        <field name="inherit_id" ref="acs_hms_base.view_patient_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(hms_patient_portal.action_hms_grant_portal_access)d"
+                        type="action"
+                        string="Grant Portal Access"
+                        class="btn-secondary"
+                        groups="acs_hms_base.group_hms_manager"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

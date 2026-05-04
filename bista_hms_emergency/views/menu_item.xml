@@ -91,6 +91,7 @@
     <menuitem id="menu_bista_ipd_discharges"
               name="Discharges"
               parent="menu_bista_ipd_root"
+              groups="base.group_system,bista_hms_emergency.group_ipd_manager,acs_hms.group_hms_doctor"
               sequence="15"/>
 
     <menuitem id="menu_bista_ipd_all_discharges"
@@ -118,6 +119,7 @@
     <menuitem id="menu_bista_ipd_ot"
               name="Operation Theatre"
               parent="menu_bista_ipd_root"
+              groups="base.group_system,bista_hms_emergency.group_ipd_manager,acs_hms.group_hms_doctor"
               sequence="25"/>
 
     <menuitem id="menu_bista_ot_all"
@@ -138,6 +140,7 @@
 
     <menuitem id="menu_bista_ipd_bed_mgmt"
               name="Bed Management"
+              groups="base.group_system,bista_hms_emergency.group_ipd_user"
               parent="menu_bista_ipd_root"
               sequence="20"/>
 
@@ -161,6 +164,7 @@
             id="menu_bista_ipd_nursing"
             name="Nursing"
             parent="menu_bista_ipd_root"
+            groups="base.group_system,bista_hms_emergency.group_ipd_user"
             sequence="30"/>
 
     <menuitem id="menu_bista_nursing_sheets"
@@ -187,6 +191,7 @@
 
     <menuitem id="menu_bista_configuration"
               name="Configuration"
+              groups="bista_hms_emergency.group_ipd_manager,base.group_system"
               parent="menu_bista_ipd_root"
               sequence="100"/>
 

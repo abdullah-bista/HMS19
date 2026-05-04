@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Doctor's lab result list: inherits existing list, adds decoration for pending/ready states -->
+    <record id="view_lab_test_list_doctor" model="ir.ui.view">
+        <field name="name">patient.laboratory.test.list.doctor</field>
+        <field name="model">patient.laboratory.test</field>
+        <field name="inherit_id" ref="acs_laboratory.patient_laboratory_test_list"/>
+        <field name="arch" type="xml">
+            <list position="attributes">
+                <attribute name="decoration-success">state == 'done'</attribute>
+                <attribute name="decoration-warning">state == 'draft'</attribute>
+            </list>
+        </field>
+    </record>
+
+    <!-- My Lab Requests: filtered to tests ordered by current physician -->
+    <record id="action_my_lab_requests" model="ir.actions.act_window">
+        <field name="name">My Lab Requests</field>
+        <field name="res_model">patient.laboratory.test</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('physician_id.user_id', '=', uid)]</field>
+        <field name="view_id" ref="view_lab_test_list_doctor"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No lab tests found.</p>
+            <p>Lab tests you ordered will appear here. Results ready are shown in green.</p>
+        </field>
+    </record>
+
+</odoo>
