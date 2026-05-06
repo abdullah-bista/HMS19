@@ -6,3 +6,6 @@ portal_prescription_line_read,Portal Prescription Line Read,acs_hms.model_prescr
 portal_acs_patient_evaluation_read,Portal Evaluation Read,acs_hms.model_acs_patient_evaluation,base.group_portal,1,0,0,0
 portal_hms_physician_read,Portal Physician Read,acs_hms_base.model_hms_physician,base.group_portal,1,0,0,0
 portal_hms_grant_portal_access,Grant Portal Access Wizard,hms_patient_portal.model_hms_grant_portal_access,acs_hms_base.group_hms_manager,1,1,1,1
+portal_hr_department_access,portal hr department access,hr.model_hr_department,base.group_portal,1,0,0,0
+access_report_paperformat_portal,Report Paperformat Portal,base.model_report_paperformat,base.group_portal,1,0,0,0
+access_physician_portal,Access Physician Portal,acs_hms.model_hms_physician,base.group_portal,1,0,0,0

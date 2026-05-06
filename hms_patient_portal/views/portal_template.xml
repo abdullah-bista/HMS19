@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <template id="patient_portal_docs_entry" inherit_id="portal.portal_docs_entry">
+        <xpath expr="//img" position="attributes">
+            <attribute name="t-attf-style">#{icon_style}</attribute>
+        </xpath>
+    </template>
+
     <!-- ================================================================== -->
     <!-- BREADCRUMBS                                                         -->
     <!-- ================================================================== -->
@@ -57,29 +63,41 @@
     <template id="portal_my_home_hms_patient" name="HMS Patient Portal - My Health"
               inherit_id="portal.portal_my_home" priority="35" customize_show="True">
         <div id="portal_client_category" position="after">
-            <div class="o_portal_category row g-2 mt-3" id="portal_hms_patient_category">
+            <!-- Section heading gives HMS records a dedicated visual block -->
+            <h5 class="fw-bold text-primary border-bottom pb-2 mt-4 mb-2">
+                My Medical Records
+            </h5>
+            <div class="o_portal_category row g-2" id="portal_hms_patient_category">
                 <t t-call="portal.portal_docs_entry">
+                    <t t-set="icon" t-value="'/hms_patient_portal/static/src/img/appointment.svg'"/>
                     <t t-set="title">Appointments</t>
                     <t t-set="url" t-value="'/my/appointments'"/>
                     <t t-set="text">View your appointment history and request a new appointment</t>
-                    <t t-set="placeholder_count" t-value="'appointment_count'"/>
+                    <t t-set="placeholder_count" t-value="'hms_appointment_count'"/>
+                    <t t-set="icon_style" t-value="'width: 50px;'"/>
                 </t>
                 <t t-call="portal.portal_docs_entry">
+                    <t t-set="icon" t-value="'/acs_hms/static/src/img/prescription.png'"/>
                     <t t-set="title">Prescriptions</t>
                     <t t-set="url" t-value="'/my/prescriptions'"/>
                     <t t-set="text">Review your prescriptions and medicines</t>
-                    <t t-set="placeholder_count" t-value="'prescription_count'"/>
+                    <t t-set="placeholder_count" t-value="'hms_prescription_count'"/>
+                    <t t-set="icon_style" t-value="'width: 50px;'"/>
                 </t>
                 <t t-call="portal.portal_docs_entry">
+                    <t t-set="icon" t-value="'/acs_hms/static/src/img/treatment.png'"/>
                     <t t-set="title">Treatments</t>
                     <t t-set="url" t-value="'/my/treatments'"/>
                     <t t-set="text">View your treatment history and diagnosis records</t>
-                    <t t-set="placeholder_count" t-value="'treatment_count'"/>
+                    <t t-set="placeholder_count" t-value="'hms_treatment_count'"/>
+                    <t t-set="icon_style" t-value="'width: 50px;'"/>
                 </t>
                 <t t-call="portal.portal_docs_entry">
+                    <t t-set="icon" t-value="'/acs_hms_base/static/src/img/patient.png'"/>
                     <t t-set="title">Health Summary</t>
                     <t t-set="url" t-value="'/my/health_summary'"/>
                     <t t-set="text">Your latest vitals and health data</t>
+                    <t t-set="icon_style" t-value="'width: 50px;'"/>
                 </t>
             </div>
         </div>
